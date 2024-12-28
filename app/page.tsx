@@ -1,9 +1,12 @@
 import { cookies } from "next/headers";
-
 import Link from "next/link";
 import UserProfile from "./components/UserProfile/UserProfile";
-import fetchSpotifyData, { SpotifyUserData } from "./utilFn/fetchSpotifyData";
+import fetchSpotifyData, {
+  SpotifyTopArtistsResponse,
+  SpotifyUserDataResponse,
+} from "./utilFn/fetchSpotifyData";
 import LogoutBtn from "./components/Utils/LogoutBtn/LogoutBtn";
+import Artists from "./components/UserProfile/Artists/Artists";
 
 export default async function DashboardPage() {
   const cookieStore = await cookies();
@@ -18,9 +21,14 @@ export default async function DashboardPage() {
     );
   }
 
-  const userData = await fetchSpotifyData<SpotifyUserData>(
+  const userData = await fetchSpotifyData<SpotifyUserDataResponse>(
     accessToken,
     "/v1/me"
+  );
+
+  const topArtists = await fetchSpotifyData<SpotifyTopArtistsResponse>(
+    accessToken,
+    "/v1/me/top/artists"
   );
 
   if (!userData.data) {
@@ -31,7 +39,14 @@ export default async function DashboardPage() {
       </div>
     );
   }
+  if (!topArtists.data) {
+    return <p>there are no are artists</p>;
+  }
 
-  // At this point, userData.data is guaranteed to be non-null
-  return <UserProfile userData={{ data: userData.data }} />;
+  return (
+    <>
+      <UserProfile userData={userData.data} />;
+      <Artists topArtists={topArtists.data.items} />
+    </>
+  );
 }

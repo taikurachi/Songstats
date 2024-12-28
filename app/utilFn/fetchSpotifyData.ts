@@ -3,25 +3,25 @@ export type SpotifyAPIResponse<T> = {
   error: string | null;
 };
 
-export type Artist = {
+export type ArtistType = {
   id: string;
   name: string;
   popularity: number;
   genres: string[];
+  href: string;
   images: { url: string }[];
 };
-export type SpotifyUserData = {
+export type SpotifyUserDataResponse = {
   display_name: string;
   images: { url: string }[];
   followers: { total: number };
 };
 export type SpotifyFollowingResponse = {
-  artists: { items: Artist[]; total: number };
+  artists: { items: ArtistType[]; total: number };
 };
 
 export type SpotifyTopArtistsResponse = {
-  items: Artist[];
-  total: number;
+  data: { items: ArtistType[] };
 };
 
 export default async function fetchSpotifyData<T>(
@@ -38,6 +38,7 @@ export default async function fetchSpotifyData<T>(
     const response = await fetch(url.toString(), {
       headers: { Authorization: `Bearer ${accessToken}` },
     });
+
     const data = await response.json();
 
     if (response.status === 401) {
