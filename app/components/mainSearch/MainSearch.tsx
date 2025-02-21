@@ -1,23 +1,39 @@
-import { AnimatePresence, motion } from "motion/react";
+import { motion } from "motion/react";
 import Image from "next/image";
 import { ChangeEvent, useEffect } from "react";
 import { useState } from "react";
+import { fetchSongs } from "@/app/utilsFn/fetchSongs";
+import { useToken } from "@/app/context/tokenContext";
+import Song from "./Song";
 type MainSearchProps = {
   searchString: string;
   setSearchString: (value: string | ((prev: string) => string)) => void;
 };
+
 export default function MainSearch({
   searchString,
   setSearchString,
 }: MainSearchProps) {
+  const { token } = useToken(); // Get the token from context
+  console.log(token);
   const [activeInput, setActiveInput] = useState<boolean>(false);
+  const [songs, setSongs] = useState([]);
   const handleOnChange = (e: ChangeEvent<HTMLInputElement>) => {
     setSearchString(e.target.value);
     setActiveInput(true);
   };
+
   useEffect(() => {
-    setActiveInput(searchString === "" ? false : true);
+    if (!token) return;
+    if (searchString.length === 0) setSongs([]);
+    if (searchString.length !== 0) {
+      (async () => {
+        const songs = await fetchSongs(searchString, token);
+        setSongs(songs);
+      })();
+    }
   }, [searchString]);
+
   return (
     <main
       className={`h-[calc(100svh-110px)] flex items-center justify-center flex-col mt-[-55px] mx-auto w-min gap-10
@@ -35,10 +51,13 @@ export default function MainSearch({
 
       <motion.div
         layout
-        initial={{ height: 0 }}
-        animate={{ height: 500 }}
-        transition={{ type: "spring", stiffness: 120, damping: 20 }}
-        className={`bg-green-500 rounded-[30px]`}
+        initial={{ height: 0, opacity: 0 }}
+        animate={{ height: activeInput ? 460 : 94, opacity: 1 }}
+        exit={{ height: 94, opacity: 0 }}
+        transition={{
+          height: { type: "spring", stiffness: 120, damping: 20 },
+        }}
+        className={`rounded-[30px] flex flex-col`}
       >
         <div
           className={`flex gap-3 bg-white pl-10 pr-10 pt-8 pb-8 ${
@@ -53,6 +72,8 @@ export default function MainSearch({
             alt="search icon"
           />
           <input
+            onFocus={() => setActiveInput(true)}
+            // onBlur={() => setActiveInput(false)}
             onChange={handleOnChange}
             value={searchString}
             type="text"
@@ -61,8 +82,12 @@ export default function MainSearch({
           />
         </div>
         {activeInput && (
-          <div className="h-[400px] pl-10 pr-10 pt-8 pb-8 rounded-b-[30px]">
-            hi
+          <div className="overflow-hidden flex-1 rounded-b-[30px]">
+            <div className="h-full flex flex-col gap-2 text-black bg-white pl-10 pr-10 pb-6 overflow-y-scroll">
+              {songs.map((song, index) => (
+                <Song song={song} index={index} key={index} />
+              ))}
+            </div>
           </div>
         )}
       </motion.div>
