@@ -2,6 +2,7 @@
 import { useRef, useEffect, useState } from "react";
 import { motion } from "motion/react";
 import Image from "next/image";
+import Link from "next/link";
 
 export default function Header() {
   const [searchString, setSearchString] = useState<string>("");
@@ -27,12 +28,14 @@ export default function Header() {
   return (
     <header className="p-8 h-[110px] flex items-center">
       <nav className="flex justify-between w-full max-w-[1800px] mx-auto">
-        <Image
-          src="/spotify-logo.svg"
-          width={130}
-          height={80}
-          alt="spotify logo"
-        />
+        <Link href="/">
+          <Image
+            src="/spotify-logo.svg"
+            width={130}
+            height={80}
+            alt="spotify logo"
+          />
+        </Link>
         <motion.div
           initial={{ width: "8rem" }}
           animate={{ width: clicked ? "15rem" : "8rem" }}

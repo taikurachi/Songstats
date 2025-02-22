@@ -14,8 +14,7 @@ export default function MainSearch({
   searchString,
   setSearchString,
 }: MainSearchProps) {
-  const { token } = useToken(); // Get the token from context
-  console.log(token);
+  const { token } = useToken();
   const [activeInput, setActiveInput] = useState<boolean>(false);
   const [songs, setSongs] = useState([]);
   const handleOnChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -32,7 +31,7 @@ export default function MainSearch({
         setSongs(songs);
       })();
     }
-  }, [searchString]);
+  }, [searchString, token]);
 
   return (
     <main
