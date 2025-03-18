@@ -3,26 +3,34 @@ import { useRef, useEffect, useState } from "react";
 import { motion } from "motion/react";
 import Image from "next/image";
 import Link from "next/link";
-
+import { useToken } from "@/app/context/tokenContext";
+import { fetchSongs } from "@/app/utilsFn/fetchSongs";
+import { SongType } from "@/app/types/types";
+import SongSM from "./SongSM";
 export default function Header() {
   const [searchString, setSearchString] = useState<string>("");
-  const [clicked, setClicked] = useState<boolean>(false);
-  const ref = useRef<HTMLDivElement>(null);
+  const [activeInput, setActiveInput] = useState<boolean>(false);
+  const [songs, setSongs] = useState<SongType[]>([]);
+  const { token } = useToken();
+
   const inputRef = useRef<HTMLInputElement>(null);
+
   useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (ref.current && !ref.current.contains(event.target as Node)) {
-        setClicked(false);
-        setSearchString("");
-      }
-    };
-    document.addEventListener("click", handleClickOutside);
-    return () => {
-      document.removeEventListener("click", handleClickOutside);
-    };
-  });
+    if (!token) return;
+    if (searchString.length === 0) {
+      setActiveInput(false);
+      setSongs([]);
+    }
+    if (searchString.length !== 0) {
+      setActiveInput(true);
+      (async () => {
+        const songs = await fetchSongs(searchString, token);
+        setSongs(songs);
+      })();
+    }
+  }, [searchString, token]);
+
   const handleClick = () => {
-    setClicked((clicked) => !clicked);
     inputRef.current?.focus();
   };
   return (
@@ -38,27 +46,41 @@ export default function Header() {
         </Link>
         <motion.div
           initial={{ width: "8rem" }}
-          animate={{ width: clicked ? "15rem" : "8rem" }}
+          animate={{ width: activeInput ? "20rem" : "8rem" }}
           transition={{ duration: 0.3, ease: "backOut" }}
           onClick={handleClick}
-          ref={ref}
-          className="flex items-center gap-4 cursor-pointer transition-[max-width]"
+          className="cursor-pointer transition-[max-width]"
         >
-          <Image
-            className="invert"
-            src="/search-icon.svg"
-            width={30}
-            height={30}
-            alt="search icon"
-          />
-          <input
-            ref={inputRef}
-            type="text"
-            placeholder="Search"
-            className={`outline-none bg-transparent w-full`}
-            value={searchString}
-            onChange={(e) => setSearchString(e.target.value)}
-          />
+          <div className="flex items-center gap-4">
+            <Image
+              className="invert"
+              src="/search-icon.svg"
+              width={30}
+              height={30}
+              alt="search icon"
+            />
+            <input
+              ref={inputRef}
+              // onBlur={() => {
+              //   setSearchString("");
+              //   setSongs([]);
+              //   setActiveInput(false);
+              // }}
+              onFocus={() => setActiveInput(true)}
+              type="text"
+              placeholder="Search"
+              className={`outline-none bg-transparent w-full`}
+              value={searchString}
+              onChange={(e) => setSearchString(e.target.value)}
+            />
+          </div>
+          {songs.length !== 0 && (
+            <div className="absolute bg-slate-900 rounded-lg p-4 flex flex-col items-start gap-2 mt-4">
+              {songs.map((song, index) => (
+                <SongSM song={song} index={index} key={index} />
+              ))}
+            </div>
+          )}
         </motion.div>
       </nav>
     </header>

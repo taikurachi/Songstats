@@ -2,15 +2,15 @@ import { SongType } from "@/app/types/types";
 import Image from "next/image";
 import Link from "next/link";
 import truncateText from "@/app/utilsFn/truncateText";
-type SongProps = {
+type SongSMProps = {
   song: SongType;
   index: number;
 };
 
-export default function Song({ song, index }: SongProps) {
+export default function SongSM({ song, index }: SongSMProps) {
   return (
     <Link href={`songs/${song.id}`}>
-      <div className="flex gap-4 justify-center items-center">
+      <div className="flex gap-4 justify-start items-center hover:bg-slate-50 w-full">
         <span className="w-5">{index + 1}</span>
         <Image
           src={song.album.images[2].url}
@@ -27,7 +27,6 @@ export default function Song({ song, index }: SongProps) {
             )}
           </p>
         </div>
-        <p className="ml-auto">{truncateText(song.album.name, 15)}</p>
       </div>
     </Link>
   );

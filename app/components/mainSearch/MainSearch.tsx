@@ -5,18 +5,14 @@ import { useState } from "react";
 import { fetchSongs } from "@/app/utilsFn/fetchSongs";
 import { useToken } from "@/app/context/tokenContext";
 import Song from "./Song";
-type MainSearchProps = {
-  searchString: string;
-  setSearchString: (value: string | ((prev: string) => string)) => void;
-};
+import { SongType } from "@/app/types/types";
 
-export default function MainSearch({
-  searchString,
-  setSearchString,
-}: MainSearchProps) {
+export default function MainSearch() {
+  const [searchString, setSearchString] = useState<string>("");
   const { token } = useToken();
   const [activeInput, setActiveInput] = useState<boolean>(false);
-  const [songs, setSongs] = useState([]);
+  const [topSongs, setTopSongs] = useState<SongType[]>([]);
+  const [songs, setSongs] = useState<SongType[]>([]);
   const handleOnChange = (e: ChangeEvent<HTMLInputElement>) => {
     setSearchString(e.target.value);
     setActiveInput(true);
@@ -24,8 +20,12 @@ export default function MainSearch({
 
   useEffect(() => {
     if (!token) return;
-    if (searchString.length === 0) setSongs([]);
+    if (searchString.length === 0) {
+      setActiveInput(false);
+      setSongs([]);
+    }
     if (searchString.length !== 0) {
+      setActiveInput(true);
       (async () => {
         const songs = await fetchSongs(searchString, token);
         setSongs(songs);
@@ -71,8 +71,10 @@ export default function MainSearch({
             alt="search icon"
           />
           <input
-            onFocus={() => setActiveInput(true)}
-            // onBlur={() => setActiveInput(false)}
+            onBlur={() => {
+              setSearchString("");
+              setActiveInput(false);
+            }}
             onChange={handleOnChange}
             value={searchString}
             type="text"
@@ -98,6 +100,7 @@ export default function MainSearch({
         Recommended: <span className="ml-4">Sienna</span>{" "}
         <span className="ml-4">Die For You</span>{" "}
         <span className="ml-4">Blessed</span>
+        topSongs.map()
       </motion.p>
     </main>
   );

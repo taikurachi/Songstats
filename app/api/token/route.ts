@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import axios from "axios";
-
+import { cookies } from "next/headers";
 export async function GET() {
   try {
     const refresh_token = process.env.SPOTIFY_REFRESH_TOKEN;
@@ -31,6 +31,27 @@ export async function GET() {
     );
 
     const accessToken = response.data.access_token;
+
+    const cookieStore = await cookies();
+    // cookieStore.set("token", accessToken, {
+    //   httpOnly: true,
+    //   secure: process.env.NODE_ENV === "production", // Only set secure cookies in production
+    //   maxAge: 60 * 60 * 24, // 1 day expiry
+    //   path: "/",
+    //   sameSite: "strict",
+    // });
+
+    cookieStore.set({
+      name: "token",
+      value: accessToken,
+      httpOnly: true,
+      maxAge: 60 * 60 * 24,
+      path: "/",
+      sameSite: "strict",
+    });
+
+    console.log("Cookie set successfully");
+
     return NextResponse.json({ access_token: accessToken });
   } catch (error) {
     console.error("Error fetching Spotify access token:", error);

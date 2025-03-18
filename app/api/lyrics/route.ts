@@ -4,7 +4,7 @@ import { NextRequest } from "next/server";
 export async function GET(req: NextRequest) {
   const url = new URL(req.url);
   const isrc = url.searchParams.get("isrc");
-  console.log(isrc, "ISRC Code");
+
   if (!isrc) {
     return new Response(JSON.stringify({ error: "ISRC code is required" }), {
       status: 400,
