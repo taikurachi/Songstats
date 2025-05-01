@@ -11,9 +11,10 @@ import changeColor from "@/app/utilsFn/colorFn/changeColor";
 import checkLuminance from "@/app/utilsFn/colorFn/checkLuminance";
 import SimilarSongs from "./SimilarSongs";
 import Genres from "./Genres";
-import Details from "./Details";
 import About from "./About";
 import { ArtistType } from "@/app/types/types";
+import Sidebar from "../utils/Sidebar";
+
 // Server Component: Fetch data on the server side
 export default async function SongPage({ id }: { id: string }) {
   if (!id) {
@@ -43,7 +44,9 @@ export default async function SongPage({ id }: { id: string }) {
   const seconds = totalSeconds % 60;
 
   return (
-    <div className="flex flex-col">
+    <div className="h-screen w-full grid grid-cols-[240px_1fr] grid-rows-[64px_1fr] overflow-hidden">
+      <Sidebar />
+      <Header />
       <div
         style={{
           background: `linear-gradient(180deg, ${convertToRGB(
@@ -55,9 +58,8 @@ export default async function SongPage({ id }: { id: string }) {
             )
           )} )`,
         }}
-        className="pb-8"
+        className="col-start-2 row-start-2 overflow-y-auto bg-[#121212] min-h-[calc(100vh-64px)] p-6 pl-8"
       >
-        <Header />
         <main className="flex gap-10 max-w-[1800px] pr-8 pl-8">
           <div className="w-[140px] h-[140px] relative shadow-2xl">
             <Image
@@ -112,14 +114,13 @@ export default async function SongPage({ id }: { id: string }) {
           </div>
         </main>
       </div>
-      <div className="flex-1 grid gap-4 grid-cols-[1fr_1.3fr_1fr] p-8 max-w-[1800px]">
-        <Lyrics songData={songData} dominantColor={dominantColor} />
-        <About dominantColor={dominantColor} />
+      {/* <div className="flex-1 grid gap-4 grid-cols-[1fr_1.3fr_1fr] p-8 max-w-[1800px]"> */}
+      {/* <Lyrics songData={songData} dominantColor={dominantColor} />
+        <About dominantColor={dominantColor} songData={songData} />
         <Genres dominantColor={dominantColor} />
-        <Details dominantColor={dominantColor} />
         <Events songData={songData} dominantColor={dominantColor} />
-        <SimilarSongs dominantColor={dominantColor} />
-      </div>
+        <SimilarSongs dominantColor={dominantColor} /> */}
+      {/* </div> */}
     </div>
   );
 }

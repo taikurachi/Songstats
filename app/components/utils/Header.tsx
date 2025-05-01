@@ -1,12 +1,14 @@
 "use client";
 import { useRef, useEffect, useState } from "react";
-import { motion } from "motion/react";
+// import { motion } from "motion/react";
 import Image from "next/image";
 import Link from "next/link";
 import { useToken } from "@/app/context/tokenContext";
 import { fetchSongs } from "@/app/utilsFn/fetchSongs";
 import { SongType } from "@/app/types/types";
 import SongSM from "./SongSM";
+import Icon from "./Icon";
+import QuickSearch from "./QuickSearch";
 export default function Header() {
   const [searchString, setSearchString] = useState<string>("");
   const [activeInput, setActiveInput] = useState<boolean>(false);
@@ -34,8 +36,9 @@ export default function Header() {
     inputRef.current?.focus();
   };
   return (
-    <header className="p-8 h-[110px] flex items-center">
-      <nav className="flex justify-between w-full max-w-[1800px] mx-auto">
+    <header className="fixed top-0 h-16 bg-black z-40 flex justify-between items-center px-8 w-full">
+      <QuickSearch />
+      <div className="flex justify-between w-full max-w-[1800px] mx-auto items-center">
         <Link href="/">
           <Image
             src="/spotify-logo.svg"
@@ -44,45 +47,69 @@ export default function Header() {
             alt="spotify logo"
           />
         </Link>
-        <motion.div
-          initial={{ width: "8rem" }}
-          animate={{ width: activeInput ? "20rem" : "8rem" }}
-          transition={{ duration: 0.3, ease: "backOut" }}
-          onClick={handleClick}
-          className="cursor-pointer transition-[max-width]"
-        >
-          <div className="flex items-center gap-4">
-            <Image
-              className="invert"
-              src="/search-icon.svg"
-              width={30}
-              height={30}
-              alt="search icon"
-            />
-            <input
-              ref={inputRef}
-              // onBlur={() => {
-              //   setSearchString("");
-              //   setSongs([]);
-              //   setActiveInput(false);
-              // }}
-              onFocus={() => setActiveInput(true)}
-              type="text"
-              placeholder="Search"
-              className={`outline-none bg-transparent w-full`}
-              value={searchString}
-              onChange={(e) => setSearchString(e.target.value)}
-            />
+        <div className="relative">
+          <div
+            className={`flex items-center gap-4 relative group bg-spotify-gray hover:bg-spotify-lightGray ${
+              activeInput ? "outline-white outline" : "outline-gray-600"
+            } hover:outline transition-colors duration-300 pl-4 pr-4 pt-[10px] pb-[10px] rounded-[30px]`}
+            onClick={handleClick}
+          >
+            <div className="flex gap-4 items-center">
+              <Icon
+                variant="search"
+                size={24}
+                className="invert group-hover:opacity-100 opacity-80 transition-opacity"
+              />
+
+              <input
+                ref={inputRef}
+                onBlur={() => {
+                  // setSearchString("");
+                  // setSongs([]);
+                  setActiveInput(false);
+                }}
+                onFocus={() => setActiveInput(true)}
+                type="text"
+                placeholder="What do you want to analyze?"
+                className={`outline-none bg-transparent w-[226px]`}
+                value={searchString}
+                onChange={(e) => setSearchString(e.target.value)}
+              />
+              <div className="group-hover:opacity-80 opacity-0 transition-opacity duration-300">
+                <span className="border border-gray-300 p-1 pr-2 pl-2 rounded-md">
+                  ⌘
+                </span>
+                <span className="border border-gray-300 ml-[6px] p-1 pr-2 pl-2 rounded-md">
+                  K
+                </span>
+              </div>
+            </div>
+            <div className="flex gap-4 items-center">
+              <span className="w-[1px] block h-8 bg-white opacity-80"></span>
+              <Icon
+                variant="home"
+                size={20}
+                className="opacity-80 hover:opacity-100 transition-opacity"
+              />
+            </div>
           </div>
           {songs.length !== 0 && (
-            <div className="absolute bg-slate-900 rounded-lg p-4 flex flex-col items-start gap-2 mt-4">
+            <div className="absolute bg-slate-900 rounded-lg p-4 flex flex-col items-start gap-2 mt-[1px] w-full">
               {songs.map((song, index) => (
                 <SongSM song={song} index={index} key={index} />
               ))}
             </div>
           )}
-        </motion.div>
-      </nav>
+        </div>
+
+        <Link
+          href="/"
+          className="flex items-center gap-4 opacity-80 hover:opacity-100 transition-opacity"
+        >
+          <Icon variant="download" size={20} />
+          <p>Get Spotify</p>
+        </Link>
+      </div>
     </header>
   );
 }

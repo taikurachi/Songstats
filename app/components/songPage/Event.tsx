@@ -23,7 +23,7 @@ export default function Event({ eventData }: EventProps) {
     month: "short",
     day: "2-digit",
   });
-  const city = eventData._embedded.venues[0].city?.name;
+  const city = eventData._embedded?.venues[0].city?.name;
   const dayOfWeek = date.toLocaleDateString("en-US", { weekday: "short" });
   const time = eventData.dates.start.localTime
     ? new Date(
@@ -34,7 +34,7 @@ export default function Event({ eventData }: EventProps) {
         hour12: true,
       })
     : "";
-  const venue = eventData._embedded.venues[0].name;
+  const venue = eventData._embedded?.venues[0].name;
 
   return (
     <div className="flex items-center gap-4 overflow-hidden hover:bg-slate-500">

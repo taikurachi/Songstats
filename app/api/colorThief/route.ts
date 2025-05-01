@@ -3,7 +3,6 @@ import ColorThief from "pure-color-thief-node";
 import fetch from "node-fetch";
 
 export async function GET(req: NextRequest) {
-  console.log("this is runnings");
   const url = new URL(req.url);
   const encodedImageUrl: string | null = url.searchParams.get("imageUrl");
 

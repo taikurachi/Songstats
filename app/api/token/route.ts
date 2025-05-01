@@ -33,13 +33,6 @@ export async function GET() {
     const accessToken = response.data.access_token;
 
     const cookieStore = await cookies();
-    // cookieStore.set("token", accessToken, {
-    //   httpOnly: true,
-    //   secure: process.env.NODE_ENV === "production", // Only set secure cookies in production
-    //   maxAge: 60 * 60 * 24, // 1 day expiry
-    //   path: "/",
-    //   sameSite: "strict",
-    // });
 
     cookieStore.set({
       name: "token",

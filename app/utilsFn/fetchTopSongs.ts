@@ -1,15 +1,19 @@
 import axios from "axios";
-const playlist_id = "37i9dQZEVXbMDoHDwVN2tF";
+import { SongType } from "../types/types";
+const playlist_id = "2DCBk0AdKhUxb2ANXckhMO";
 
 export const fetchTopSongs = async (token: string) => {
   try {
     const response = await axios.get(
-      `https://api.spotify.com//v1/playlists/${playlist_id}/tracks`,
+      `https://api.spotify.com/v1/playlists/${playlist_id}`,
       {
         headers: { Authorization: `Bearer ${token}` },
       }
     );
-    return response.data.tracks.items;
+    const items = response.data.tracks.items
+      .filter(({ track }: { track: SongType }) => track.name.length < 10)
+      .slice(0, 4);
+    return items;
   } catch (error) {
     console.error("Error fetching songs:", error);
     return [];

@@ -12,8 +12,10 @@ export default {
         sans: ["var(--font-spotifyMix)"],
       },
       colors: {
-        background: "var(--background)",
-        foreground: "var(--foreground)",
+        spotify: {
+          gray: "#1F1F1F",
+          lightGray: "#2A2A2A",
+        },
       },
     },
   },

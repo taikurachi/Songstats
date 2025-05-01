@@ -27,17 +27,16 @@ export default async function Events({ songData, dominantColor }: EventsProps) {
   if (!songData || !songData.artists[0].name) {
     return <div>No event data available.</div>;
   }
-  const eventsData = await fetchEvents(songData.artists[0].name);
-  console.log(eventsData);
-
+  const data = await fetchEvents(songData.artists[0].name);
+  const eventsData = data.length > 6 ? data.slice(0, 6) : data;
   return (
     <div
-      className="rounded-xl p-8"
+      className="rounded-xl p-8 col-span-2"
       style={{ backgroundColor: convertToRGB(dominantColor) }}
     >
       <h2 className="text-2xl font-bold">{`${songData.artists[0].name}'s Events`}</h2>
       {eventsData.length > 0 ? (
-        <div className="grid mt-8 grid-cols-2 gap-4">
+        <div className="grid mt-8 grid-cols-3 gap-4">
           {eventsData.map((eventData: EventType, index: number) => (
             <Event eventData={eventData} key={index} />
           ))}

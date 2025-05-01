@@ -37,3 +37,16 @@ export type EventType = {
     venues: { name: string }[];
   };
 };
+export type iconVariants =
+  | "home"
+  | "discover"
+  | "download"
+  | "caret"
+  | "lyrics"
+  | "play"
+  | "search"
+  | "details"
+  | "cancel"
+  | "visit"
+  | "switch"
+  | "arrow";
