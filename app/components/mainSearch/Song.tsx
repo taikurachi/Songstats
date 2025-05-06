@@ -31,12 +31,14 @@ export default function Song({ song, usage, index }: SongProps) {
           <p className="opacity-80">
             {truncateText(
               song.artists.map((artist) => artist.name).join(", "),
-              15
+              usage === "main" ? 24 : 0
             )}
           </p>
         </div>
         {usage === "main" ? (
-          <span className="ml-auto">{song.album.name}</span>
+          <span className="ml-auto">
+            {truncateText(song.album.name, usage === "main" ? 15 : 0)}
+          </span>
         ) : (
           <span className="ml-auto mr-8 px-[10px] py-[4px] text-sm text-white text-opacity-60 bg-spotify-lightGray rounded-md font-regular">
             Track

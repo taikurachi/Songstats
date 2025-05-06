@@ -2,7 +2,7 @@ import { motion } from "motion/react";
 import Image from "next/image";
 import { ChangeEvent, useEffect, useRef } from "react";
 import { useState } from "react";
-import { debouncedFetchSongs, fetchSongs } from "@/app/utilsFn/fetchSongs";
+import { debouncedFetchSongs } from "@/app/utilsFn/fetchSongs";
 import { useToken } from "@/app/context/tokenContext";
 import Song from "./Song";
 import Link from "next/link";
@@ -95,7 +95,6 @@ export default function MainSearch() {
       >
         Explore Song Data
       </motion.h1>
-
       <motion.div
         layout
         initial={{ height: 0, opacity: 0 }}
@@ -123,7 +122,7 @@ export default function MainSearch() {
             onChange={handleOnChange}
             value={searchString}
             type="text"
-            className={`text-black border-none outline-none w-4/5 sm:w-[400px] `}
+            className={`text-black border-none outline-none w-4/5 sm:w-[470px] `}
             placeholder="Search"
           />
         </div>

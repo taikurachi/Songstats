@@ -14,6 +14,7 @@ import Genres from "./Genres";
 import About from "./About";
 import { ArtistType } from "@/app/types/types";
 import Sidebar from "../utils/Sidebar";
+import SpotifyGrid from "../utils/SpotifyGrid";
 
 // Server Component: Fetch data on the server side
 export default async function SongPage({ id }: { id: string }) {
@@ -44,7 +45,7 @@ export default async function SongPage({ id }: { id: string }) {
   const seconds = totalSeconds % 60;
 
   return (
-    <div className="h-screen w-full grid grid-cols-[240px_1fr] grid-rows-[64px_1fr] overflow-hidden">
+    <SpotifyGrid>
       <Sidebar />
       <Header />
       <div
@@ -114,13 +115,6 @@ export default async function SongPage({ id }: { id: string }) {
           </div>
         </main>
       </div>
-      {/* <div className="flex-1 grid gap-4 grid-cols-[1fr_1.3fr_1fr] p-8 max-w-[1800px]"> */}
-      {/* <Lyrics songData={songData} dominantColor={dominantColor} />
-        <About dominantColor={dominantColor} songData={songData} />
-        <Genres dominantColor={dominantColor} />
-        <Events songData={songData} dominantColor={dominantColor} />
-        <SimilarSongs dominantColor={dominantColor} /> */}
-      {/* </div> */}
-    </div>
+    </SpotifyGrid>
   );
 }

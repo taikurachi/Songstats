@@ -4,7 +4,7 @@ import KeyboardNavigation from "./KeyboardNavigation";
 import { SongType } from "@/app/types/types";
 import Song from "../mainSearch/Song";
 import { useToken } from "@/app/context/tokenContext";
-import { debouncedFetchSongs, fetchSongs } from "@/app/utilsFn/fetchSongs";
+import { debouncedFetchSongs } from "@/app/utilsFn/fetchSongs";
 export default function QuickSearch() {
   const [isSearchOpen, setIsSearchOpen] = useState<boolean>(false);
   const [searchQuery, setSearchQuery] = useState<string>("");
@@ -102,7 +102,7 @@ export default function QuickSearch() {
           >
             <KeyboardNavigation isTyping={isTyping} />
             <div className="flex-1 mt-4 overflow-hidden pl-8">
-              <div className="flex flex-col h-full gap-2 overflow-scroll py-4">
+              <div className="flex flex-col h-full gap-4 overflow-scroll py-4">
                 {songs.length > 0 &&
                   songs.map((song: SongType, index: number) => (
                     <Song song={song} index={index} key={index} usage="quick" />

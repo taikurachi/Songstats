@@ -19,6 +19,7 @@
     "next": "15.1.2",
     "node-fetch": "^3.3.2",
     "openai": "^4.89.0",
+    "p5": "^2.0.1",
     "pure-color-thief-node": "^1.0.8",
     "react": "^19.0.0",
     "react-dom": "^19.0.0"

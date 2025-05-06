@@ -1,5 +1,5 @@
 "use client";
-import { useRef, useEffect, useState } from "react";
+import { useRef, useEffect, useState, ChangeEvent } from "react";
 // import { motion } from "motion/react";
 import Image from "next/image";
 import Link from "next/link";
@@ -9,32 +9,64 @@ import { SongType } from "@/app/types/types";
 import SongSM from "./SongSM";
 import Icon from "./Icon";
 import QuickSearch from "./QuickSearch";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 export default function Header() {
   const [searchString, setSearchString] = useState<string>("");
   const [activeInput, setActiveInput] = useState<boolean>(false);
+  const [isInitialized, setIsInitialized] = useState(false);
   const [songs, setSongs] = useState<SongType[]>([]);
   const { token } = useToken();
-
   const inputRef = useRef<HTMLInputElement>(null);
+  const router = useRouter();
+  const pathname = usePathname();
 
   useEffect(() => {
-    if (!token) return;
-    if (searchString.length === 0) {
-      setActiveInput(false);
-      setSongs([]);
+    // Check if the path matches the pattern /search/something
+    if (pathname.startsWith("/search/")) {
+      const query = decodeURIComponent(pathname.replace("/search/", ""));
+      setSearchString(query);
     }
-    if (searchString.length !== 0) {
-      setActiveInput(true);
-      (async () => {
-        const songs = await fetchSongs(searchString, token);
-        setSongs(songs);
-      })();
-    }
-  }, [searchString, token]);
+    setIsInitialized(true);
+  }, [pathname]);
 
-  const handleClick = () => {
-    inputRef.current?.focus();
-  };
+  useEffect(() => {
+    if (!isInitialized) return;
+
+    const timer = setTimeout(() => {
+      if (searchString.trim()) {
+        router.push(`/search/${encodeURIComponent(searchString)}`);
+      } else {
+        router.push("/search");
+      }
+    }, 300);
+
+    return () => clearTimeout(timer);
+  }, [searchString, isInitialized, router]);
+
+  // useEffect(() => {
+  //   if (inputRef.current && activeInput) inputRef.current.focus();
+  // }, [activeInput]);
+
+  // useEffect(() => {
+  //   if (!token) return;
+  //   if (searchString.length === 0) {
+  //     setActiveInput(false);
+  //     setSongs([]);
+  //   } else {
+  //     setActiveInput(true);
+  //     const fetchSongData = async () => {
+  //       const songs = await fetchSongs(searchString, token);
+  //       setSongs(songs);
+  //     };
+  //     fetchSongData();
+  //   }
+  // }, [searchString, token]);
+
+  const handleClick = () => inputRef.current?.focus();
+
+  const handleOnChange = async (e: ChangeEvent<HTMLInputElement>) =>
+    setSearchString(e.target.value);
+
   return (
     <header className="fixed top-0 h-16 bg-black z-40 flex justify-between items-center px-8 w-full">
       <QuickSearch />
@@ -73,7 +105,7 @@ export default function Header() {
                 placeholder="What do you want to analyze?"
                 className={`outline-none bg-transparent w-[226px]`}
                 value={searchString}
-                onChange={(e) => setSearchString(e.target.value)}
+                onChange={handleOnChange}
               />
               <div className="group-hover:opacity-80 opacity-0 transition-opacity duration-300">
                 <span className="border border-gray-300 p-1 pr-2 pl-2 rounded-md">
