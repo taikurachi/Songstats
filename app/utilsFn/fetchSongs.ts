@@ -1,11 +1,15 @@
 import axios from "axios";
 import { debounce } from "@/app/utilsFn/debounce";
 
-export const fetchSongs = async (query: string, token: string) => {
+export const fetchSongs = async (
+  query: string,
+  token: string,
+  limit: number = 20
+) => {
   try {
     const response = await axios.get("https://api.spotify.com/v1/search", {
       headers: { Authorization: `Bearer ${token}` },
-      params: { q: query, type: "track" },
+      params: { q: query, type: "track", limit: limit },
     });
     return response.data.tracks.items;
   } catch (error) {

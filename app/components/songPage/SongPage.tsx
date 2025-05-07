@@ -45,76 +45,72 @@ export default async function SongPage({ id }: { id: string }) {
   const seconds = totalSeconds % 60;
 
   return (
-    <SpotifyGrid>
-      <Sidebar />
-      <Header />
-      <div
-        style={{
-          background: `linear-gradient(180deg, ${convertToRGB(
-            dominantColor
-          )}, ${convertToRGB(
-            changeColor(
-              dominantColor,
-              checkLuminance(dominantColor) < 0.46 ? 50 : -100
-            )
-          )} )`,
-        }}
-        className="col-start-2 row-start-2 overflow-y-auto bg-[#121212] min-h-[calc(100vh-64px)] p-6 pl-8"
-      >
-        <main className="flex gap-10 max-w-[1800px] pr-8 pl-8">
-          <div className="w-[140px] h-[140px] relative shadow-2xl">
-            <Image
-              className="rounded-sm"
-              src={songData.album.images[0].url}
-              alt={`${songData.album.name} album image`}
-              layout="fill"
-              objectFit="contain"
-            />
-          </div>
-          <div>
-            <h1 className="font-extrabold text-8xl mb-3 ">{songData.name}</h1>
-            <div className="flex items-center gap-2">
-              <div
-                className="flex "
-                style={{
-                  marginRight: artistData?.length
-                    ? (artistData.length - 1) * -10
-                    : 0,
-                }}
-              >
-                {artistData?.map((artist, index) => (
-                  <div key={index} className="w-[30px] h-[30px] relative">
-                    <Image
-                      style={{ marginLeft: index * -10 }}
-                      className="rounded-full inline-block"
-                      src={artist.images[0].url}
-                      layout="fill"
-                      objectFit="contain"
-                      alt={`${artist.name} image`}
-                    />
-                  </div>
-                ))}
-              </div>
-              <span>·</span>
-              <p className="font-medium">
-                {songData.artists
-                  .map((artist: ArtistType) => artist.name)
-                  .join("  ·  ")}
-              </p>
-              <span className="opacity-80">·</span>
-              <p className="opacity-80">{songData.album.name}</p>
-              <span className="opacity-80">·</span>
-              <p className="opacity-80">
-                {songData.album.release_date.slice(0, 4)}
-              </p>
-              <span className="opacity-80">·</span>
-              <p className="opacity-80">{`${minutes}.${
-                seconds < 10 ? "0" + seconds : seconds
-              }`}</p>
+    <div
+      style={{
+        background: `linear-gradient(180deg, ${convertToRGB(
+          dominantColor
+        )}, ${convertToRGB(
+          changeColor(
+            dominantColor,
+            checkLuminance(dominantColor) < 0.46 ? 50 : -100
+          )
+        )} )`,
+      }}
+      className="col-start-2 row-start-2 overflow-y-auto bg-[#121212] min-h-[calc(100vh-64px)] p-6 pl-8"
+    >
+      <main className="flex gap-10 max-w-[1800px] pr-8 pl-8">
+        <div className="w-[140px] h-[140px] relative shadow-2xl">
+          <Image
+            className="rounded-sm"
+            src={songData.album.images[0].url}
+            alt={`${songData.album.name} album image`}
+            layout="fill"
+            objectFit="contain"
+          />
+        </div>
+        <div>
+          <h1 className="font-extrabold text-8xl mb-3 ">{songData.name}</h1>
+          <div className="flex items-center gap-2">
+            <div
+              className="flex "
+              style={{
+                marginRight: artistData?.length
+                  ? (artistData.length - 1) * -10
+                  : 0,
+              }}
+            >
+              {artistData?.map((artist, index) => (
+                <div key={index} className="w-[30px] h-[30px] relative">
+                  <Image
+                    style={{ marginLeft: index * -10 }}
+                    className="rounded-full inline-block"
+                    src={artist.images[0].url}
+                    layout="fill"
+                    objectFit="contain"
+                    alt={`${artist.name} image`}
+                  />
+                </div>
+              ))}
             </div>
+            <span>·</span>
+            <p className="font-medium">
+              {songData.artists
+                .map((artist: ArtistType) => artist.name)
+                .join("  ·  ")}
+            </p>
+            <span className="opacity-80">·</span>
+            <p className="opacity-80">{songData.album.name}</p>
+            <span className="opacity-80">·</span>
+            <p className="opacity-80">
+              {songData.album.release_date.slice(0, 4)}
+            </p>
+            <span className="opacity-80">·</span>
+            <p className="opacity-80">{`${minutes}.${
+              seconds < 10 ? "0" + seconds : seconds
+            }`}</p>
           </div>
-        </main>
-      </div>
-    </SpotifyGrid>
+        </div>
+      </main>
+    </div>
   );
 }

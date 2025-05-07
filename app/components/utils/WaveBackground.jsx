@@ -1,4 +1,4 @@
-import { motion } from "framer-motion"; // Fixed import statement
+import { motion } from "motion/react"; // Fixed import statement
 import dynamic from "next/dynamic";
 
 const P5Wrapper = dynamic(() => import("./P5Wrapper"), {

@@ -9,39 +9,23 @@ import { SongType } from "@/app/types/types";
 import SongSM from "./SongSM";
 import Icon from "./Icon";
 import QuickSearch from "./QuickSearch";
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 export default function Header() {
   const [searchString, setSearchString] = useState<string>("");
   const [activeInput, setActiveInput] = useState<boolean>(false);
-  const [isInitialized, setIsInitialized] = useState(false);
   const [songs, setSongs] = useState<SongType[]>([]);
   const { token } = useToken();
   const inputRef = useRef<HTMLInputElement>(null);
   const router = useRouter();
-  const pathname = usePathname();
-
+  useEffect(() => setActiveInput(searchString.length !== 0), [searchString]);
   useEffect(() => {
-    // Check if the path matches the pattern /search/something
-    if (pathname.startsWith("/search/")) {
-      const query = decodeURIComponent(pathname.replace("/search/", ""));
-      setSearchString(query);
-    }
-    setIsInitialized(true);
-  }, [pathname]);
-
-  useEffect(() => {
-    if (!isInitialized) return;
-
-    const timer = setTimeout(() => {
-      if (searchString.trim()) {
-        router.push(`/search/${encodeURIComponent(searchString)}`);
-      } else {
-        router.push("/search");
-      }
-    }, 300);
-
-    return () => clearTimeout(timer);
-  }, [searchString, isInitialized, router]);
+    if (!activeInput) return;
+    router.push(
+      `/search${
+        searchString.trim() ? "/" + encodeURIComponent(searchString) : ""
+      }`
+    );
+  }, [searchString, activeInput, router]);
 
   // useEffect(() => {
   //   if (inputRef.current && activeInput) inputRef.current.focus();
@@ -100,7 +84,7 @@ export default function Header() {
                   // setSongs([]);
                   setActiveInput(false);
                 }}
-                onFocus={() => setActiveInput(true)}
+                // onFocus={() => setActiveInput(true)}
                 type="text"
                 placeholder="What do you want to analyze?"
                 className={`outline-none bg-transparent w-[226px]`}
