@@ -9,12 +9,9 @@ import { fetchColor } from "@/app/utilsFn/fetchColor";
 import convertToRGB from "@/app/utilsFn/colorFn/convertToRGB";
 import changeColor from "@/app/utilsFn/colorFn/changeColor";
 import checkLuminance from "@/app/utilsFn/colorFn/checkLuminance";
-import SimilarSongs from "./SimilarSongs";
-import Genres from "./Genres";
-import About from "./About";
+
 import { ArtistType } from "@/app/types/types";
-import Sidebar from "../utils/Sidebar";
-import SpotifyGrid from "../utils/SpotifyGrid";
+import getSongLength from "@/app/utilsFn/getSongLength";
 
 // Server Component: Fetch data on the server side
 export default async function SongPage({ id }: { id: string }) {
@@ -39,10 +36,6 @@ export default async function SongPage({ id }: { id: string }) {
   );
 
   const { dominantColor } = await fetchColor(songData.album.images[0].url);
-
-  const totalSeconds = Math.floor(songData.duration_ms / 1000);
-  const minutes = Math.floor(totalSeconds / 60);
-  const seconds = totalSeconds % 60;
 
   return (
     <div
@@ -105,9 +98,7 @@ export default async function SongPage({ id }: { id: string }) {
               {songData.album.release_date.slice(0, 4)}
             </p>
             <span className="opacity-80">·</span>
-            <p className="opacity-80">{`${minutes}.${
-              seconds < 10 ? "0" + seconds : seconds
-            }`}</p>
+            <p className="opacity-80">{getSongLength(songData.duration_ms)}</p>
           </div>
         </div>
       </main>

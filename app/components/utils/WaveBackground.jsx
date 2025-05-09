@@ -244,36 +244,11 @@ const sketch = (p) => {
   p.setup = function () {
     p.createCanvas(p.windowWidth, p.windowHeight, p.WEBGL);
     p.frameRate(60);
-    p.camera(0, 0, p.height * 0.8, 0, 0, 0, 0, 1, 0);
     p.smooth();
 
     lastX = p.mouseX;
     lastY = p.mouseY;
-
-    // Create initial boxes in batches for smoother loading
-    createInitialBoxesBatched();
   };
-
-  function createInitialBoxesBatched() {
-    const totalBoxes = 15;
-    let created = 0;
-
-    function createBatch() {
-      const batchSize = Math.min(5, totalBoxes - created);
-      for (let i = 0; i < batchSize; i++) {
-        const x = p.random(-p.width / 2, p.width / 2);
-        const y = p.random(-p.height / 2, p.height / 2);
-        boxes.push(getBox(x, y, 0));
-        created++;
-      }
-
-      if (created < totalBoxes) {
-        setTimeout(createBatch, 30);
-      }
-    }
-
-    createBatch();
-  }
 
   p.draw = function () {
     p.background(0);

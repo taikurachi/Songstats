@@ -2,7 +2,7 @@ import { useEffect, useState, useRef, ChangeEvent } from "react";
 import Icon from "./Icon";
 import KeyboardNavigation from "./KeyboardNavigation";
 import { SongType } from "@/app/types/types";
-import Song from "../mainSearch/Song";
+import Song from "../mainSearch/MainSearchSong";
 import { useToken } from "@/app/context/tokenContext";
 import { debouncedFetchSongs } from "@/app/utilsFn/fetchSongs";
 export default function QuickSearch() {

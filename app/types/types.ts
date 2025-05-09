@@ -14,6 +14,13 @@ export type SongType = {
   };
 };
 
+export type AlbumType = {
+  id: string;
+  artists: ArtistType[];
+  album_type: string;
+  name: string;
+};
+
 export type ArtistType = {
   genres: string[];
   id: string;

@@ -4,7 +4,7 @@ import { ChangeEvent, useEffect, useRef } from "react";
 import { useState } from "react";
 import { debouncedFetchSongs } from "@/app/utilsFn/fetchSongs";
 import { useToken } from "@/app/context/tokenContext";
-import Song from "./Song";
+import Song from "./MainSearchSong";
 import Link from "next/link";
 import { SongType } from "@/app/types/types";
 import { fetchTopSongs } from "@/app/utilsFn/fetchTopSongs";

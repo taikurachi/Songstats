@@ -10,7 +10,7 @@ type SongProps = {
   usage: "main" | "quick";
 };
 
-export default function Song({ song, usage, index }: SongProps) {
+export default function MainSearchSong({ song, usage, index }: SongProps) {
   return (
     <Link href={`songs/${song.id}`} className="w-full">
       <motion.div
@@ -21,7 +21,7 @@ export default function Song({ song, usage, index }: SongProps) {
       >
         <Image
           className="rounded-sm"
-          src={song.album.images[2].url}
+          src={song.album.images[0].url}
           alt={`${song.album.name} album image`}
           width={50}
           height={50}
