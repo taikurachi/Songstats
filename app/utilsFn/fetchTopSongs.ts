@@ -2,6 +2,7 @@ import axios from "axios";
 import { SongType } from "../types/types";
 const playlist_id = "2DCBk0AdKhUxb2ANXckhMO";
 
+// top songs for intro screen
 export const fetchTopSongs = async (token: string) => {
   try {
     const response = await axios.get(

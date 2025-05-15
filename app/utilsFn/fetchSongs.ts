@@ -1,6 +1,7 @@
 import axios from "axios";
 import { debounce } from "@/app/utilsFn/debounce";
 
+//fetching due to search
 export const fetchSongs = async (
   query: string,
   token: string,

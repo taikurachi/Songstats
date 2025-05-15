@@ -1,5 +1,7 @@
 import axios from "axios";
-import { AlbumType, ArtistType } from "../types/types";
+import { AlbumType, ArtistType, SongType } from "../types/types";
+
+// fetching featured songs where given artist is not the main artist
 export const fetchFeaturedSongs = async (artistID: string, token: string) => {
   try {
     const response = await axios.get(
@@ -31,7 +33,7 @@ export const fetchFeaturedSongs = async (artistID: string, token: string) => {
     });
     const limitedAlbums = relevantAlbums.slice(0, 6);
     const albumIDs = limitedAlbums.map((album: AlbumType) => album.id);
-    const featuredSongs: { id: string; imageURL: string; name: string }[] = [];
+    const featuredSongs: SongType[] = [];
 
     const albumsResponse = await axios.get(
       `https://api.spotify.com/v1/albums`,
@@ -56,8 +58,7 @@ export const fetchFeaturedSongs = async (artistID: string, token: string) => {
         // Add matched tracks to our result
         for (const track of matchedTracks) {
           featuredSongs.push({
-            id: track.id,
-            name: track.name,
+            ...track,
             imageURL:
               album.images && album.images.length > 0
                 ? album.images[0].url

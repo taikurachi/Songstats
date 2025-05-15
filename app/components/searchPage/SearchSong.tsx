@@ -5,7 +5,10 @@ import Link from "next/link";
 
 export default function SearchSong({ song }: { song: SongType }) {
   return (
-    <Link href={`/songs/${song.id}`} className="hover:bg-spotify-gray p-2">
+    <Link
+      href={`/songs/${song.id}`}
+      className="hover:bg-spotify-gray p-2 rounded-lg"
+    >
       <div className="flex items-center gap-4 w-full">
         <Image
           className="rounded-md"

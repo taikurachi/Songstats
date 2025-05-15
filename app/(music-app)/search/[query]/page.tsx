@@ -6,17 +6,14 @@ import { use, useEffect, useState } from "react";
 import Image from "next/image";
 import SearchSong from "@/app/components/searchPage/SearchSong";
 import { fetchFeaturedSongs } from "@/app/utilsFn/fetchFeaturedSongs";
-import truncateText from "@/app/utilsFn/truncateText";
-import Link from "next/link";
+import SongMD from "@/app/components/utils/SongMD";
 export default function Page({
   params,
 }: {
   params: Promise<{ query: string }>;
 }) {
   const [songs, setSongs] = useState<SongType[]>([]);
-  const [featuredSongs, setFeaturedSongs] = useState<
-    { name: string; imageURL: string; id: string }[]
-  >([]);
+  const [featuredSongs, setFeaturedSongs] = useState<SongType[]>([]);
   const { token } = useToken();
   const resolvedParams = use(params);
   const decodedQuery = decodeURIComponent(resolvedParams.query);
@@ -38,8 +35,10 @@ export default function Page({
   useEffect(() => {
     if (!token || songs.length <= 0) return;
     const fetchFeatured = async () => {
-      const featuredSongs: { name: string; imageURL: string; id: string }[] =
-        await fetchFeaturedSongs(songs[0].artists[0].id, token);
+      const featuredSongs = await fetchFeaturedSongs(
+        songs[0].artists[0].id,
+        token
+      );
       setFeaturedSongs(featuredSongs);
     };
     fetchFeatured();
@@ -49,11 +48,11 @@ export default function Page({
     <div className="col-start-2 row-start-2 p-8">
       <div className="flex-col sm:flex-row flex gap-2">
         {songs.length > 0 && (
-          <div className="flex-1">
+          <div className="flex-1 flex flex-col">
             <h3 className="text-2xl font-semibold">Top Result</h3>
-            <div className="p-5 rounded-lg bg-spotify-gray mt-2 ">
+            <div className="p-5 rounded-lg bg-spotify-gray mt-2 flex-1">
               <Image
-                className="rounded-lg"
+                className="rounded-lg shadow-2xl"
                 width={songs[0].album.images[0].width / 7}
                 height={songs[0].album.images[0].width / 7}
                 src={songs[0].album.images[0].url}
@@ -79,27 +78,14 @@ export default function Page({
         )}
       </div>
       {featuredSongs.length > 0 && (
-        <div>
+        <div className="mt-4">
           <h3 className="text-2xl font-semibold">
             Featuring {songs[0].artists[0].name}
           </h3>
-          <div className="flex gap-2 mt-2">
-            {featuredSongs.map(
-              (
-                song: { name: string; imageURL: string; id: string },
-                index: number
-              ) => (
-                <Link href={`/songs/${song.id}`} key={index}>
-                  <Image
-                    src={song.imageURL}
-                    height={160}
-                    width={160}
-                    alt={`${song.name} album image`}
-                  />
-                  <div key={index}>{truncateText(song.name, 15)}</div>
-                </Link>
-              )
-            )}
+          <div className="flex mt-2 ml-[-12px]">
+            {featuredSongs.map((song: SongType, index: number) => (
+              <SongMD song={song} key={index} />
+            ))}
           </div>
         </div>
       )}

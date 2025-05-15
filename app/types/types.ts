@@ -12,6 +12,7 @@ export type SongType = {
   external_ids: {
     isrc: string;
   };
+  imageURL?: string;
 };
 
 export type AlbumType = {
@@ -41,7 +42,7 @@ export type EventType = {
   name: string;
   url: string;
   _embedded: {
-    venues: { name: string }[];
+    venues: { city: { name: string }; name: string }[];
   };
 };
 export type iconVariants =

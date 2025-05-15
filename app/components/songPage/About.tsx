@@ -3,7 +3,7 @@ import { SongType } from "@/app/types/types";
 import convertToRGB from "@/app/utilsFn/colorFn/convertToRGB";
 import { fetchSongDetails } from "@/app/utilsFn/fetchSongDetails";
 import { useEffect, useState } from "react";
-import instrumentsFilter from "@/app/filters/instruments";
+// import instrumentsFilter from "@/app/filters/instruments";
 
 type AboutProps = {
   dominantColor: number[];

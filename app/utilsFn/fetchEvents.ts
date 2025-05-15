@@ -11,7 +11,9 @@ export const fetchEvents = async (artistName: string) => {
       artistName
     )}`;
     const res = await axios.get(url);
-    return res?.data?._embedded?.events || [];
+    const eventsData = res?.data?._embedded?.events;
+    if (!eventsData) return [];
+    return eventsData.length > 6 ? eventsData.slice(0, 6) : eventsData;
   } catch (err) {
     console.error(err);
     return [];

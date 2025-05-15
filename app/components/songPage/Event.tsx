@@ -1,23 +1,6 @@
-type EventProps = {
-  eventData: EventType;
-};
-type EventType = {
-  dates: {
-    start: {
-      localDate: string;
-      dateTime: string;
-      localTime: string;
-    };
-    timezone: string;
-  };
-  name: string;
-  url: string;
-  _embedded: {
-    venues: { name: string; city: { name: string } }[];
-  };
-};
+import { EventType } from "@/app/types/types";
 
-export default function Event({ eventData }: EventProps) {
+export default function Event({ eventData }: { eventData: EventType }) {
   const date = new Date(eventData.dates.start.dateTime);
   const formattedDate = date.toLocaleDateString("en-US", {
     month: "short",
@@ -37,10 +20,10 @@ export default function Event({ eventData }: EventProps) {
   const venue = eventData._embedded?.venues[0].name;
 
   return (
-    <div className="flex items-center gap-4 overflow-hidden hover:bg-slate-500">
-      <div className="p-2 pr-4 pl-4 bg-slate-700 text-center flex flex-col justify-center items-center rounded-lg">
-        <p className="text-[1.125rem]">{formattedDate.slice(0, 4)}</p>
-        <p className="font-bold text-[1.25rem]"> {formattedDate.slice(-2)}</p>
+    <div className="flex items-center gap-4 overflow-hidden hover:bg-slate-500 p-2 rounded-lg">
+      <div className="p-2 pr-4 pl-4 bg-slate-700 text-center flex flex-col justify-center items-center rounded-lg w-20">
+        <p className="text-[1.25rem]">{formattedDate.slice(0, 4)}</p>
+        <p className="font-bold text-[1.4rem]"> {formattedDate.slice(-2)}</p>
       </div>
       <div className="flex-1">
         <p className="text-[1.25rem] font-medium">{city}</p>
