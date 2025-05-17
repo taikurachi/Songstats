@@ -1,5 +1,5 @@
 import { useEffect, useState, useRef, ChangeEvent } from "react";
-import Icon from "./Icon";
+import Icon from "../utils/Icon";
 import KeyboardNavigation from "./KeyboardNavigation";
 import { SongType } from "@/app/types/types";
 import Song from "../mainSearch/MainSearchSong";

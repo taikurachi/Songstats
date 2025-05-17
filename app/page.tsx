@@ -3,7 +3,7 @@ import Link from "next/link";
 import Image from "next/image";
 import Icon from "./components/utils/Icon";
 import MainSearch from "./components/mainSearch/MainSearch";
-import WaveBackground from "./components/utils/WaveBackground";
+import WaveBackground from "./components/IntroAnimation/WaveBackground";
 export default function Home() {
   return (
     <>

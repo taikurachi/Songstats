@@ -6,8 +6,8 @@ import SpotifyGrid from "../components/utils/SpotifyGrid";
 export default function AppLayout({ children }: { children: ReactNode }) {
   return (
     <SpotifyGrid>
-      <Sidebar />
       <Header />
+      <Sidebar />
       {children}
     </SpotifyGrid>
   );

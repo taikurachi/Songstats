@@ -1,20 +1,13 @@
 "use client";
 import { useRef, useEffect, useState, ChangeEvent } from "react";
-// import { motion } from "motion/react";
 import Image from "next/image";
 import Link from "next/link";
-import { useToken } from "@/app/context/tokenContext";
-import { fetchSongs } from "@/app/utilsFn/fetchSongs";
-import { SongType } from "@/app/types/types";
-import SongSM from "./SongSM";
 import Icon from "./Icon";
-import QuickSearch from "./QuickSearch";
+import QuickSearch from "../QuickSearch";
 import { useRouter } from "next/navigation";
 export default function Header() {
   const [searchString, setSearchString] = useState<string>("");
   const [activeInput, setActiveInput] = useState<boolean>(false);
-  const [songs, setSongs] = useState<SongType[]>([]);
-  const { token } = useToken();
   const inputRef = useRef<HTMLInputElement>(null);
   const router = useRouter();
   useEffect(() => setActiveInput(searchString.length !== 0), [searchString]);
@@ -27,32 +20,13 @@ export default function Header() {
     );
   }, [searchString, activeInput, router]);
 
-  // useEffect(() => {
-  //   if (inputRef.current && activeInput) inputRef.current.focus();
-  // }, [activeInput]);
-
-  // useEffect(() => {
-  //   if (!token) return;
-  //   if (searchString.length === 0) {
-  //     setActiveInput(false);
-  //     setSongs([]);
-  //   } else {
-  //     setActiveInput(true);
-  //     const fetchSongData = async () => {
-  //       const songs = await fetchSongs(searchString, token);
-  //       setSongs(songs);
-  //     };
-  //     fetchSongData();
-  //   }
-  // }, [searchString, token]);
-
   const handleClick = () => inputRef.current?.focus();
 
   const handleOnChange = async (e: ChangeEvent<HTMLInputElement>) =>
     setSearchString(e.target.value);
 
   return (
-    <header className="fixed top-0 h-16 bg-black z-40 flex justify-between items-center px-8 w-full">
+    <header className="sticky top-0 bg-black z-40 flex justify-between items-center px-8 w-full col-span-2">
       <QuickSearch />
       <div className="flex justify-between w-full max-w-[1800px] mx-auto items-center">
         <Link href="/">
@@ -109,15 +83,7 @@ export default function Header() {
               />
             </div>
           </div>
-          {songs.length !== 0 && (
-            <div className="absolute bg-slate-900 rounded-lg p-4 flex flex-col items-start gap-2 mt-[1px] w-full">
-              {songs.map((song, index) => (
-                <SongSM song={song} index={index} key={index} />
-              ))}
-            </div>
-          )}
         </div>
-
         <Link
           href="/"
           className="flex items-center gap-4 opacity-80 hover:opacity-100 transition-opacity"

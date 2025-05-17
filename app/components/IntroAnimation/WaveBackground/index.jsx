@@ -1,11 +1,11 @@
 import { motion } from "motion/react"; // Fixed import statement
 import dynamic from "next/dynamic";
 
-const P5Wrapper = dynamic(() => import("./P5Wrapper"), {
+const P5Wrapper = dynamic(() => import("../p5Wrapper"), {
   ssr: false,
 });
 
-function WaveBackground() {
+export default function WaveBackground() {
   return (
     <motion.div
       initial={{ opacity: 0 }}
@@ -414,5 +414,3 @@ const sketch = (p) => {
     return false;
   };
 };
-
-export default WaveBackground;
