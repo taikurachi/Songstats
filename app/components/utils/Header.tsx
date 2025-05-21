@@ -4,12 +4,19 @@ import Image from "next/image";
 import Link from "next/link";
 import Icon from "./Icon";
 import QuickSearch from "../QuickSearch";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 export default function Header() {
   const [searchString, setSearchString] = useState<string>("");
   const [activeInput, setActiveInput] = useState<boolean>(false);
   const inputRef = useRef<HTMLInputElement>(null);
   const router = useRouter();
+  const pathname = usePathname();
+  useEffect(() => {
+    if (pathname.startsWith("/songs/")) {
+      setSearchString("");
+      setActiveInput(false);
+    }
+  }, [pathname]);
   useEffect(() => setActiveInput(searchString.length !== 0), [searchString]);
   useEffect(() => {
     if (!activeInput) return;

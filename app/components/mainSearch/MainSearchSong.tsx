@@ -9,7 +9,7 @@ type SongProps = {
   song: SongType;
   index: number;
   usage: "main" | "quick";
-  ref: ForwardedRef<HTMLAnchorElement>;
+  ref?: ForwardedRef<HTMLAnchorElement>;
 };
 
 export default function Song({ song, usage, index, ref }: SongProps) {

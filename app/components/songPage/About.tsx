@@ -21,7 +21,7 @@ export default function Genres({ dominantColor, songData }: AboutProps) {
 
     const fetchDetails = async () => {
       const content = await fetchSongDetails(artistName, songName);
-      const citations: string[] = content.citations;
+      // const citations: string[] = content.citations;
 
       if (!content) return;
 
