@@ -19,4 +19,4 @@ export const fetchSongs = async (
   }
 };
 
-export const debouncedFetchSongs = debounce(fetchSongs, 300);
+export const debouncedFetchSongs = debounce(fetchSongs, 500);

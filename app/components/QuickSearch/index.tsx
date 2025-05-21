@@ -5,6 +5,7 @@ import { SongType } from "@/app/types/types";
 import Song from "../mainSearch/MainSearchSong";
 import { useToken } from "@/app/context/tokenContext";
 import { debouncedFetchSongs } from "@/app/utilsFn/fetchSongs";
+import { useRouter } from "next/navigation";
 export default function QuickSearch() {
   const [isSearchOpen, setIsSearchOpen] = useState<boolean>(false);
   const [searchQuery, setSearchQuery] = useState<string>("");
@@ -12,7 +13,17 @@ export default function QuickSearch() {
   const [isTyping, setIsTyping] = useState<boolean>(false);
   const inputRef = useRef<HTMLInputElement>(null);
   const modalRef = useRef<HTMLDivElement>(null);
+  const songRefs = useRef<HTMLAnchorElement[]>([]);
+  const [selectedIndex, setSelectedIndex] = useState<number>(0);
+  const router = useRouter();
+
   const { token } = useToken();
+
+  useEffect(() => {
+    songRefs.current = songRefs.current.slice(0, songs.length);
+    if (songs.length > 0) songRefs.current[0].focus();
+  }, [songs]);
+
   useEffect(() => {
     if (!token) return;
     if (searchQuery === "") {
@@ -63,11 +74,44 @@ export default function QuickSearch() {
         setSearchQuery("");
       }
     };
-
     document.addEventListener("mousedown", handleClickOutside);
-
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [isSearchOpen]);
+
+  useEffect(() => {
+    const handleKeyboardNavigation = (event: KeyboardEvent) => {
+      // if not keyboard nav, return immediately
+      if (
+        !isSearchOpen ||
+        (event.key !== "ArrowUp" &&
+          event.key !== "ArrowDown" &&
+          !(event.metaKey && event.key === "Enter"))
+      )
+        return;
+
+      let newIndex: number = 0;
+      if (event.key === "ArrowUp") {
+        if (selectedIndex === 0) return;
+        newIndex = selectedIndex - 1;
+      }
+      if (event.key === "ArrowDown") {
+        if (selectedIndex === songs.length - 1) return;
+        newIndex = selectedIndex + 1;
+      }
+
+      if (event.metaKey && event.key === "Enter") {
+        router.push(`/songs/${songs[selectedIndex].id}`);
+        setIsSearchOpen(false);
+        setSearchQuery("");
+        return;
+      }
+      setSelectedIndex(newIndex);
+      songRefs.current[newIndex]?.focus();
+    };
+    document.addEventListener("keydown", handleKeyboardNavigation);
+    return () =>
+      document.removeEventListener("keydown", handleKeyboardNavigation);
+  }, [isSearchOpen, selectedIndex, songs, router]);
 
   const handleOnChange = (e: ChangeEvent<HTMLInputElement>) =>
     setSearchQuery(e.target.value);
@@ -101,11 +145,25 @@ export default function QuickSearch() {
             }`}
           >
             <KeyboardNavigation isTyping={isTyping} />
-            <div className="flex-1 mt-4 overflow-hidden pl-8">
-              <div className="flex flex-col h-full gap-4 overflow-scroll py-4">
+            <div className="flex-1 overflow-hidden pl-4">
+              <div
+                className="flex flex-col h-full overflow-y-scroll pb-4 custom-scrollbar"
+                onClick={() => {
+                  setIsSearchOpen(false);
+                  setSearchQuery("");
+                }}
+              >
                 {songs.length > 0 &&
                   songs.map((song: SongType, index: number) => (
-                    <Song song={song} index={index} key={index} usage="quick" />
+                    <Song
+                      ref={(el) => {
+                        if (el) songRefs.current[index] = el;
+                      }}
+                      song={song}
+                      index={index}
+                      key={index}
+                      usage="quick"
+                    />
                   ))}
               </div>
             </div>

@@ -18,19 +18,14 @@ export const fetchFeaturedSongs = async (artistID: string, token: string) => {
     );
 
     const relevantAlbums = response.data.items.filter((album: AlbumType) => {
-      const isVariousArtists = album.artists.some(
-        (artist) => artist.name.toLowerCase() === "various artists"
-      );
-      const isSingle = album.album_type === "single";
       const isCompilation = album.album_type === "compilation";
       const hasGenericTitle =
         /relaxing|mood|sleep|chill|sad|happy|vibes|playlist|20\d\d/.test(
           album.name.toLowerCase()
         );
-      return (
-        !isVariousArtists && !isCompilation && !hasGenericTitle && !isSingle
-      );
+      return !isCompilation && !hasGenericTitle;
     });
+    if (relevantAlbums.length === 0) return [];
     const limitedAlbums = relevantAlbums.slice(0, 6);
     const albumIDs = limitedAlbums.map((album: AlbumType) => album.id);
     const featuredSongs: SongType[] = [];
@@ -47,15 +42,12 @@ export const fetchFeaturedSongs = async (artistID: string, token: string) => {
       }
     );
     for (const album of albumsResponse.data.albums) {
-      // Each album already includes its tracks, so we don't need separate API calls
       if (album.tracks && album.tracks.items) {
-        // Find tracks that feature our artist
         const matchedTracks = album.tracks.items.filter(
           (track: { artists: ArtistType[] }) =>
             track.artists.some((artist: ArtistType) => artist.id === artistID)
         );
 
-        // Add matched tracks to our result
         for (const track of matchedTracks) {
           featuredSongs.push({
             ...track,

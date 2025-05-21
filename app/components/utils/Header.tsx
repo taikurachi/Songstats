@@ -44,7 +44,7 @@ export default function Header() {
             } hover:outline transition-colors duration-300 pl-4 pr-4 pt-[10px] pb-[10px] rounded-[30px]`}
             onClick={handleClick}
           >
-            <div className="flex gap-4 items-center">
+            <div className="flex gap-4 items-center relative">
               <Icon
                 variant="search"
                 size={24}
@@ -56,23 +56,32 @@ export default function Header() {
                 onBlur={() => {
                   // setSearchString("");
                   // setSongs([]);
-                  setActiveInput(false);
+                  // setActiveInput(false);
                 }}
                 // onFocus={() => setActiveInput(true)}
                 type="text"
                 placeholder="What do you want to analyze?"
-                className={`outline-none bg-transparent w-[226px]`}
+                className={`outline-none bg-transparent w-[300px]`}
                 value={searchString}
                 onChange={handleOnChange}
               />
-              <div className="group-hover:opacity-80 opacity-0 transition-opacity duration-300">
-                <span className="border border-gray-300 p-1 pr-2 pl-2 rounded-md">
-                  ⌘
+              {activeInput ? (
+                <span
+                  className="absolute right-0 hover:scale-110 cursor-pointer"
+                  onClick={() => setSearchString("")}
+                >
+                  <Icon variant="cancel" size={16} />
                 </span>
-                <span className="border border-gray-300 ml-[6px] p-1 pr-2 pl-2 rounded-md">
-                  K
-                </span>
-              </div>
+              ) : (
+                <div className="absolute right-0 group-hover:opacity-80 opacity-0 transition-opacity duration-300">
+                  <span className="border border-gray-300 p-1 pr-2 pl-2 rounded-md">
+                    ⌘
+                  </span>
+                  <span className="border border-gray-300 ml-[6px] p-1 pr-2 pl-2 rounded-md">
+                    K
+                  </span>
+                </div>
+              )}
             </div>
             <div className="flex gap-4 items-center">
               <span className="w-[1px] block h-8 bg-white opacity-80"></span>

@@ -1,6 +1,8 @@
 import convertToRGB from "@/app/utilsFn/colorFn/convertToRGB";
 import { fetchEvents } from "@/app/utilsFn/fetchEvents";
 import Event from "./Event";
+import { type EventType } from "@/app/types/types";
+
 type EventsProps = {
   songData: {
     artists: { name: string }[];
@@ -8,21 +10,6 @@ type EventsProps = {
   dominantColor: number[];
 };
 
-type EventType = {
-  dates: {
-    start: {
-      localDate: string;
-      dateTime: string;
-      localTime: string;
-    };
-    timezone: string;
-  };
-  name: string;
-  url: string;
-  _embedded: {
-    venues: { name: string; city: { name: string } }[];
-  };
-};
 export default async function Events({ songData, dominantColor }: EventsProps) {
   if (!songData || !songData.artists[0].name) {
     return <div>No event data available.</div>;

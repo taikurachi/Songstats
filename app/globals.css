@@ -2,6 +2,27 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Add this to your globals.css file */
+@layer utilities {
+  /* Custom scrollbar */
+  .custom-scrollbar {
+    scrollbar-color: #949aa2 transparent; /* Dark gray thumb, transparent track */
+  }
+  .custom-scrollbar::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+  .custom-scrollbar::-webkit-scrollbar-track {
+    @apply bg-spotify-gray rounded-md;
+  }
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    @apply bg-spotify-gray rounded-md;
+  }
+  .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    @apply bg-spotify-gray;
+  }
+}
+
 :root {
   --background: #ffffff;
   --foreground: #121212;

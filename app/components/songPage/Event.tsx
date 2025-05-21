@@ -1,12 +1,14 @@
 import { EventType } from "@/app/types/types";
 
 export default function Event({ eventData }: { eventData: EventType }) {
-  const date = new Date(eventData.dates.start.dateTime);
+  const date = new Date(
+    eventData.dates.start?.dateTime ?? eventData.dates.start.localDate
+  );
   const formattedDate = date.toLocaleDateString("en-US", {
     month: "short",
     day: "2-digit",
   });
-  const city = eventData._embedded?.venues[0].city?.name;
+  const city = eventData._embedded?.venues[0].city?.name ?? "TBD";
   const dayOfWeek = date.toLocaleDateString("en-US", { weekday: "short" });
   const time = eventData.dates.start.localTime
     ? new Date(
@@ -31,8 +33,12 @@ export default function Event({ eventData }: { eventData: EventType }) {
           <p className="w-max whitespace-nowrap">
             {dayOfWeek} {time}
           </p>
-          <span>·</span>
-          <p className="flex-grow whitespace-nowrap">{venue}</p>
+          {venue && (
+            <>
+              <span>·</span>
+              <p className="flex-grow whitespace-nowrap">{venue}</p>
+            </>
+          )}
         </div>
       </div>
     </div>

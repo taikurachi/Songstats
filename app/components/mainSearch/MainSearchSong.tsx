@@ -3,16 +3,22 @@ import Image from "next/image";
 import { motion } from "motion/react";
 import Link from "next/link";
 import truncateText from "@/app/utilsFn/truncateText";
+import { ForwardedRef } from "react";
 
 type SongProps = {
   song: SongType;
   index: number;
   usage: "main" | "quick";
+  ref: ForwardedRef<HTMLAnchorElement>;
 };
 
-export default function MainSearchSong({ song, usage, index }: SongProps) {
+export default function Song({ song, usage, index, ref }: SongProps) {
   return (
-    <Link href={`songs/${song.id}`} className="w-full">
+    <Link
+      ref={ref}
+      href={`/songs/${song.id}`}
+      className="w-full hover:bg-spotify-lightGray p-4 rounded-lg focus:bg-spotify-lightGray focus:outline-none"
+    >
       <motion.div
         className="flex gap-4 items-center"
         initial={{ opacity: 0 }}
@@ -20,11 +26,11 @@ export default function MainSearchSong({ song, usage, index }: SongProps) {
         transition={{ delay: index / 30 }}
       >
         <Image
-          className="rounded-sm"
+          className="rounded-lg shadow-2xl"
           src={song.album.images[0].url}
           alt={`${song.album.name} album image`}
-          width={50}
-          height={50}
+          width={40}
+          height={40}
         />
         <div>
           <p className="font-regular text-lg">{song.name}</p>
