@@ -1,15 +1,6 @@
 import axios from "axios";
-type ArtistType = {
-  genres: string[];
-  id: string;
-  popularity: number;
-  images: { url: string; height: number; width: number }[];
-  name: string;
-};
-export const fetchArtistData = async (
-  artistIds: string[],
-  token: string
-): Promise<ArtistType[] | undefined> => {
+
+export const fetchArtistData = async (artistIds: string[], token: string) => {
   try {
     const res = await Promise.all(
       artistIds.map((artistId) =>
@@ -24,5 +15,6 @@ export const fetchArtistData = async (
     return artistData;
   } catch (error) {
     console.error(error);
+    return [];
   }
 };

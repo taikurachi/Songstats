@@ -27,15 +27,8 @@ export default async function SongPage({ params }: { params: { id: string } }) {
     songData.artists.map((artist: ArtistType) => artist.id),
     token
   );
-  const artistSongData =
-    artistData && artistData.length > 0
-      ? await fetchArtistSongData(artistData[0].id, token)
-      : null;
-  const artistEvents =
-    artistData && artistData.length > 0
-      ? await fetchEvents(artistData[0].name)
-      : null;
-
+  const artistSongData = await fetchArtistSongData(artistData[0].id, token);
+  const artistEvents = await fetchEvents(artistData[0].name);
   const { dominantColor } = await fetchColor(songData.album.images[0].url);
 
   return (
@@ -44,11 +37,11 @@ export default async function SongPage({ params }: { params: { id: string } }) {
         style={{
           background: getColorPalette(dominantColor),
         }}
-        className="flex gap-10 max-w-[1800px] p-8"
+        className="flex gap-10 max-w-[1800px] pl-8 pb-8 pt-12"
       >
-        <div className="w-[140px] h-[140px] relative shadow-2xl">
+        <div className="w-[200px] h-[200px] relative shadow-5xl hover:scale-102">
           <Image
-            className="rounded-sm"
+            className="rounded-md"
             src={songData.album.images[0].url}
             alt={`${songData.album.name} album image`}
             layout="fill"
@@ -58,8 +51,8 @@ export default async function SongPage({ params }: { params: { id: string } }) {
         <div className="flex flex-col justify-end">
           <p className="mb-2">Single</p>
           <h1
-            className={`font-extrabold mb-3 ${
-              songData.name.length > 10 ? "text-5xl" : "text-8xl"
+            className={`font-extrabold ${
+              songData.name.length > 10 ? "text-5xl mb-2" : "text-8xl mb-4"
             }`}
           >
             {songData.name}
@@ -111,6 +104,9 @@ export default async function SongPage({ params }: { params: { id: string } }) {
               id={id}
               isrc={songData.external_ids.isrc}
               dominantColor={dominantColor}
+              albumName={songData.album.name}
+              artistName={artistData[0].name}
+              songName={songData.name}
             />
             <div
               style={{ backgroundColor: convertToRGB(dominantColor) }}

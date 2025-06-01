@@ -17,7 +17,7 @@ export default function Song({ song, usage, index, ref }: SongProps) {
     <Link
       ref={ref}
       href={`/songs/${song.id}`}
-      className="w-full hover:bg-spotify-lightGray p-4 rounded-lg focus:bg-spotify-lightGray focus:outline-none"
+      className="w-full hover:bg-spotify-extraLightGray p-4 rounded-lg focus:bg-spotify-lightGray focus:outline-none"
     >
       <motion.div
         className="flex gap-4 items-center"
@@ -29,8 +29,8 @@ export default function Song({ song, usage, index, ref }: SongProps) {
           className="rounded-lg shadow-2xl"
           src={song.album.images[0].url}
           alt={`${song.album.name} album image`}
-          width={40}
-          height={40}
+          width={usage === "quick" ? 40 : 50}
+          height={usage === "quick" ? 40 : 50}
         />
         <div>
           <p className="font-regular text-lg">{song.name}</p>

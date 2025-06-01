@@ -5,6 +5,7 @@ import Link from "next/link";
 import Icon from "./Icon";
 import QuickSearch from "../QuickSearch";
 import { usePathname, useRouter } from "next/navigation";
+
 export default function Header() {
   const [searchString, setSearchString] = useState<string>("");
   const [activeInput, setActiveInput] = useState<boolean>(false);
@@ -12,7 +13,7 @@ export default function Header() {
   const router = useRouter();
   const pathname = usePathname();
   useEffect(() => {
-    if (pathname.startsWith("/songs/")) {
+    if (pathname.startsWith("/songs/") || pathname.startsWith("/songs")) {
       setSearchString("");
       setActiveInput(false);
     }
@@ -92,11 +93,18 @@ export default function Header() {
             </div>
             <div className="flex gap-4 items-center">
               <span className="w-[1px] block h-8 bg-white opacity-80"></span>
-              <Icon
-                variant="home"
-                size={20}
-                className="opacity-80 hover:opacity-100 transition-opacity"
-              />
+              <span
+                onClick={() => {
+                  router.push("/songs/");
+                  setActiveInput(false);
+                }}
+              >
+                <Icon
+                  variant="home"
+                  size={20}
+                  className="opacity-80 hover:opacity-100 transition-opacity"
+                />
+              </span>
             </div>
           </div>
         </div>

@@ -130,7 +130,7 @@ export default function MainSearch() {
           <div className="overflow-hidden flex-1 rounded-b-[30px]">
             <div
               ref={dropdownRef}
-              className="h-full flex flex-col gap-2 text-black bg-white pl-10 pr-10 pb-6 overflow-y-scroll"
+              className="h-full flex flex-col text-black bg-white pl-6 pr-10 pb-6 overflow-y-scroll"
             >
               {songs.map((song, index) => (
                 <Song song={song} index={index} key={index} usage="main" />
