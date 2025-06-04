@@ -57,4 +57,6 @@ export type iconVariants =
   | "cancel"
   | "visit"
   | "switch"
-  | "arrow";
+  | "arrow"
+  | "perplexity"
+  | "save";

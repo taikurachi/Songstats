@@ -6,14 +6,15 @@ import { fetchColor } from "@/app/utilsFn/fetchColor";
 import getSongLength from "@/app/utilsFn/getSongLength";
 import getColorPalette from "@/app/utilsFn/colorFn/getColorPalette";
 import { fetchArtistSongData } from "@/app/utilsFn/fetchArtistSongData";
-import { type SongType, type ArtistType, EventType } from "@/app/types/types";
-import SongMD from "@/app/components/utils/SongMD";
-import { fetchEvents } from "@/app/utilsFn/fetchEvents";
-import Event from "@/app/components/songPage/Event";
+import { type SongType, type ArtistType } from "@/app/types/types";
 import LyricsLink from "@/app/components/Links/Lyrics";
 import SimilarSongsLink from "@/app/components/Links/SimilarSongs";
 import RelatedMediaLink from "@/app/components/Links/RelatedMedia";
 import convertToRGB from "@/app/utilsFn/colorFn/convertToRGB";
+import Icon from "@/app/components/utils/Icon";
+import Link from "next/link";
+import Events from "@/app/components/songPage/Events";
+import MoreBy from "@/app/components/songPage/MoreBy";
 
 export default async function SongPage({ params }: { params: { id: string } }) {
   const { id } = await params;
@@ -27,8 +28,6 @@ export default async function SongPage({ params }: { params: { id: string } }) {
     songData.artists.map((artist: ArtistType) => artist.id),
     token
   );
-  const artistSongData = await fetchArtistSongData(artistData[0].id, token);
-  const artistEvents = await fetchEvents(artistData[0].name);
   const { dominantColor } = await fetchColor(songData.album.images[0].url);
 
   return (
@@ -96,8 +95,30 @@ export default async function SongPage({ params }: { params: { id: string } }) {
           </div>
         </div>
       </main>
-      <div className="p-8">
-        <div>
+      <div
+        className="p-8"
+        style={{
+          background: `linear-gradient(to bottom, ${convertToRGB(
+            dominantColor
+          )}, transparent 16%, transparent 100%)`,
+        }}
+      >
+        <div className="flex gap-6">
+          {/* spotify play button that opens link to song in open.spotify */}
+          {/* save button that saves to local storage  */}
+          <Link
+            href={songData.external_urls.spotify}
+            className="bg-[#1CD760] rounded-full w-[68px] h-[68px] flex justify-center items-center hover:scale-102 cursor-pointer "
+          >
+            <Icon variant="play" size={22} className="ml-1" />
+          </Link>
+          <Icon
+            variant="save"
+            size={25}
+            className="invert opacity-80 hover:opacity-100 hover:scale-102 cursor-pointer"
+          />
+        </div>
+        <div className="mt-10">
           <h3 className="font-bold text-2xl">Analyze</h3>
           <div className="flex gap-4 mt-4">
             <LyricsLink
@@ -118,17 +139,8 @@ export default async function SongPage({ params }: { params: { id: string } }) {
             <SimilarSongsLink />
           </div>
         </div>
-        {artistEvents.length > 0 && (
-          <div className="mt-20">
-            <h3 className="font-bold text-2xl">Events</h3>
-            <div className="grid grid-cols-3 ml-[-8px] mt-3">
-              {artistEvents.map((event: EventType, index: number) => (
-                <Event eventData={event} key={index} />
-              ))}
-            </div>
-          </div>
-        )}
-        {artistSongData.length > 0 && (
+        <Events songData={songData} />
+        {/* {artistSongData.length > 0 && (
           <div className="mt-20">
             <h3 className="font-bold text-2xl">
               More by {artistData && artistData[0].name}
@@ -139,7 +151,8 @@ export default async function SongPage({ params }: { params: { id: string } }) {
               ))}
             </div>
           </div>
-        )}
+        )} */}
+        <MoreBy songData={songData} />
       </div>
     </div>
   );

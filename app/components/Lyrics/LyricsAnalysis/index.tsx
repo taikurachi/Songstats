@@ -1,10 +1,16 @@
 import convertToRGB from "@/app/utilsFn/colorFn/convertToRGB";
 import { fetchLyricsDetails } from "@/app/utilsFn/fetchLyricsDetails";
-import { useState, useEffect, Dispatch, SetStateAction } from "react";
+import {
+  useState,
+  useEffect,
+  Dispatch,
+  SetStateAction,
+  RefObject,
+} from "react";
+import { motion } from "motion/react";
+import Icon from "../../utils/Icon";
 type AnalysisData = {
-  literary_devices: string[];
-  lyrics_analysis: Record<string, string>;
-  overall_themes: string[];
+  lyrics_analysis: Record<string, { analysis: string; themes: string }>;
 };
 type LyricsAnalysisProps = {
   lyrics: string[];
@@ -16,6 +22,7 @@ type LyricsAnalysisProps = {
   lyricsAnalysis: AnalysisData | null;
   setLyricsAnalysis: Dispatch<SetStateAction<AnalysisData | null>>;
   highlightedColor: number[];
+  contentRefs: RefObject<Record<string, HTMLElement | null>>;
 };
 export default function LyricsAnalysis({
   songDetails,
@@ -23,6 +30,7 @@ export default function LyricsAnalysis({
   lyricsAnalysis,
   setLyricsAnalysis,
   highlightedColor,
+  contentRefs,
 }: LyricsAnalysisProps) {
   const [loading, setLoading] = useState<boolean>(true);
   useEffect(() => {
@@ -47,33 +55,49 @@ export default function LyricsAnalysis({
   }, [lyrics, loading, lyricsAnalysis, songDetails, setLyricsAnalysis]);
 
   return (
-    <div className="flex-1 p-8 overflow-y-scroll h-full bg-spotify-darkGray rounded-lg">
+    <>
       {loading && <div>Loading...</div>}
       {lyricsAnalysis && (
         <div>
           {Object.entries(lyricsAnalysis.lyrics_analysis).map(
-            ([line, analysis], index) => (
-              <div className="mb-20" key={index}>
+            ([line, { analysis, themes }], index) => (
+              <div
+                className="mb-44"
+                ref={(el) => void (contentRefs.current[line] = el)}
+                key={index}
+              >
                 <p
                   style={{ background: `${convertToRGB(highlightedColor)}` }}
-                  className="mb-6 w-fit"
+                  className="mb-8 w-fit"
                 >
                   {line}
                 </p>
-                <p>{analysis}</p>
+                <hr className="opacity-40 mb-6" />
+                {analysis
+                  .split(".")
+                  .filter((line: string) => line)
+                  .map((line: string, index: number) => (
+                    <p key={index} className="mb-6">
+                      {line + "."}
+                    </p>
+                  ))}
+                <div className="opacity-80 font-extralight text-sm flex gap-2">
+                  <p>Themes:</p>
+                  <p>{themes.toLowerCase()}</p>
+                </div>
               </div>
             )
           )}
-          {lyricsAnalysis.literary_devices.map(
-            (device: string, index: number) => (
-              <p key={index}>{device}</p>
-            )
-          )}
-          {lyricsAnalysis.overall_themes.map((theme: string, index: number) => (
-            <p key={index}>{theme}</p>
-          ))}
+          <div className="flex gap-2 items-center">
+            <p className="text-sm font-extralight opacity-80">
+              Analysis provided by Perplexity
+            </p>
+            <motion.span>
+              <Icon variant="perplexity" size={10} className="opacity-80" />
+            </motion.span>
+          </div>
         </div>
       )}
-    </div>
+    </>
   );
 }

@@ -83,7 +83,7 @@ export default function MainSearch() {
 
   return (
     <main
-      className={`h-[calc(100svh-110px)] flex items-center justify-center flex-col mt-[-55px] mx-auto w-min gap-10
+      className={`h-[calc(100svh-80px)] flex items-center justify-center flex-col mt-[-55px] mx-auto w-min gap-10
      `}
     >
       <motion.h1

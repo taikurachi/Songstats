@@ -8,7 +8,7 @@ export default function Home() {
   return (
     <>
       <WaveBackground />
-      <header className="p-8 h-[110px] flex items-center">
+      <header className="p-8 h-[80px] flex items-center">
         <nav className="flex justify-between w-full max-w-[1800px] mx-auto">
           <Link href="/">
             <Image

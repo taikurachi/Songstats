@@ -32,20 +32,28 @@ Lyrics: ${lyrics}
 Identify the most significant and meaningful lines from these lyrics and provide analysis for each. Return your response as valid JSON only with this exact structure:
 
 {
-  "song_info": {
-    "title": "${songName}",
-    "artist": "${artistName}",
-    "album": "${albumName}"
-  },
   "lyrics_analysis": {
-    "specific lyric line 1": "detailed analysis of meaning, symbolism, and significance",
-    "specific lyric line 2": "detailed analysis of meaning, symbolism, and significance",
-    "specific lyric line 3": "detailed analysis of meaning, symbolism, and significance",
-    "specific lyric line 4": "detailed analysis of meaning, symbolism, and significance",
-    "specific lyric line 5": "detailed analysis of meaning, symbolism, and significance"
-  },
-  "overall_themes": ["theme1", "theme2", "theme3"],
-  "literary_devices": ["device1", "device2", "device3"]
+    "specific lyric line 1": {
+      "analysis": "detailed analysis of meaning, symbolism, and significance",
+      "themes": "themes that capture the overall message of given analysis"
+    },
+    "specific lyric line 2": {
+      "analysis": "detailed analysis of meaning, symbolism, and significance",
+      "themes": "themes that capture the overall message of given analysis"
+    },
+    "specific lyric line 3": {
+      "analysis": "detailed analysis of meaning, symbolism, and significance",
+      "themes": "themes that capture the overall message of given analysis"
+    },
+    "specific lyric line 4": {
+      "analysis": "detailed analysis of meaning, symbolism, and significance",
+      "themes": "themes that capture the overall message of given analysis"
+    },
+    "specific lyric line 5": {
+      "analysis": "detailed analysis of meaning, symbolism, and significance",
+      "themes": "themes that capture the overall message of given analysis"
+    }
+  }
 }
 
 Select 5-8 of the most impactful lines from the lyrics and provide thoughtful analysis for each.`;

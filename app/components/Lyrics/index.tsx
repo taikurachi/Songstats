@@ -1,9 +1,10 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { fetchLyrics } from "@/app/utilsFn/fetchLyrics";
 import convertToRGB from "@/app/utilsFn/colorFn/convertToRGB";
 import LyricsAnalysis from "./LyricsAnalysis";
 import Icon from "../utils/Icon";
+import { animate, progress } from "motion";
 
 type SongDetails = {
   songName: string;
@@ -27,19 +28,21 @@ const calcHighlightColor = (dominantColor: number[]) => {
 export default function Lyrics({ dominantColor }: { dominantColor: string }) {
   const [songDetails, setSongDetails] = useState<SongDetails | null>(null);
   const [lyricsAnalysis, setLyricsAnalysis] = useState<{
-    literary_devices: string[];
-    lyrics_analysis: Record<string, string>;
-    overall_themes: string[];
+    lyrics_analysis: Record<string, { analysis: string; themes: string }>;
   } | null>(null);
   const [lyrics, setLyrics] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const contentRefs = useRef({});
+  const containerRef = useRef<HTMLDivElement | null>(null);
 
   const wasAnalysisFound = (line: string): boolean => {
     if (!lyricsAnalysis) return false;
-    const lineLower = line.toLowerCase().trim();
+    const cleanedLower = line.replace(/["'""'']/g, "");
+    const lineLower = cleanedLower.toLowerCase().trim();
 
     return Object.keys(lyricsAnalysis.lyrics_analysis).some((key: string) => {
-      const keyLower = key.toLowerCase().trim();
+      const cleanedKey = key.replace(/["'""'']/g, "");
+      const keyLower = cleanedKey.toLowerCase().trim();
 
       return lineLower.includes(keyLower) || keyLower.includes(lineLower);
     });
@@ -71,6 +74,39 @@ export default function Lyrics({ dominantColor }: { dominantColor: string }) {
   const parsedDominantColor = JSON.parse(dominantColor);
   const highlightedColor = calcHighlightColor(parsedDominantColor);
 
+  const findElementRef = (line: string) => {
+    const cleanedLine = line.toLowerCase().replace(/["'""'']/g, "");
+
+    const elementArr = Object.entries(contentRefs.current).find(
+      ([key, element]) => {
+        const cleanedKey = key.toLowerCase().replace(/["'""'']/g, "");
+        if (
+          cleanedKey.includes(cleanedLine) ||
+          cleanedLine.includes(cleanedKey)
+        )
+          return element;
+      }
+    );
+    if (!elementArr) return;
+    return elementArr[1];
+  };
+
+  const handleLyricClick = async (line: string) => {
+    if (!lyricsAnalysis || !contentRefs.current || !containerRef.current)
+      return;
+
+    const specifiedElementRef = findElementRef(line);
+    if (!specifiedElementRef) return;
+
+    const scrollDistance =
+      (specifiedElementRef as HTMLElement).offsetTop -
+      containerRef.current.offsetTop;
+
+    const container = containerRef.current;
+
+    container.scrollTo({ top: scrollDistance - 28, behavior: "smooth" });
+  };
+
   return (
     <>
       <main
@@ -88,6 +124,7 @@ export default function Lyrics({ dominantColor }: { dominantColor: string }) {
           ) : (
             <p
               key={index}
+              onClick={() => handleLyricClick(line)}
               style={{
                 backgroundColor: `${
                   lyricsAnalysis &&
@@ -95,7 +132,9 @@ export default function Lyrics({ dominantColor }: { dominantColor: string }) {
                   convertToRGB(highlightedColor)
                 }`,
               }}
-              className={`w-fit`}
+              className={`w-fit ${
+                lyricsAnalysis && wasAnalysisFound(line) && "cursor-pointer"
+              }`}
             >
               {line}
             </p>
@@ -114,16 +153,21 @@ export default function Lyrics({ dominantColor }: { dominantColor: string }) {
           </div>
         )}
       </main>
-
-      {lyrics.length > 0 && songDetails && (
-        <LyricsAnalysis
-          lyrics={lyrics}
-          songDetails={songDetails}
-          lyricsAnalysis={lyricsAnalysis}
-          setLyricsAnalysis={setLyricsAnalysis}
-          highlightedColor={highlightedColor}
-        />
-      )}
+      <div
+        ref={containerRef}
+        className="flex-1 p-8 overflow-y-scroll h-full bg-spotify-darkGray rounded-lg"
+      >
+        {lyrics.length > 0 && songDetails && (
+          <LyricsAnalysis
+            lyrics={lyrics}
+            songDetails={songDetails}
+            lyricsAnalysis={lyricsAnalysis}
+            setLyricsAnalysis={setLyricsAnalysis}
+            highlightedColor={highlightedColor}
+            contentRefs={contentRefs}
+          />
+        )}
+      </div>
     </>
   );
 }
