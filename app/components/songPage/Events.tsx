@@ -8,12 +8,15 @@ import { motion } from "motion/react";
 export default function Events({ songData }: { songData: SongType }) {
   const [artistEvents, setArtistEvents] = useState([]);
   const [artistIndex, setArtistIndex] = useState<number>(0);
+  const [loading, setLoading] = useState<boolean>(true);
+
   useEffect(() => {
     const fetchArtistEvents = async () => {
       const artistEvents = await fetchEvents(
         songData.artists[artistIndex].name
       );
       setArtistEvents(artistEvents);
+      setLoading(false);
     };
     fetchArtistEvents();
   }, [artistIndex, songData]);
@@ -44,14 +47,18 @@ export default function Events({ songData }: { songData: SongType }) {
           </div>
         )}
       </div>
-      {artistEvents.length > 0 ? (
+      {loading && <p className="mt-4 h-20 opacity-80">Loading events...</p>}
+      {artistEvents.length > 0 && (
         <div className="grid grid-cols-3 ml-[-8px] mt-3">
           {artistEvents.map((event: EventType, index: number) => (
             <Event eventData={event} key={index} />
           ))}
         </div>
-      ) : (
-        <p className="mt-4 h-20">No upcoming events. Come back soon! :)</p>
+      )}
+      {!loading && artistEvents.length === 0 && (
+        <p className="mt-4 h-20 opacity-80">
+          No upcoming events. Come back soon! :)
+        </p>
       )}
     </div>
   );

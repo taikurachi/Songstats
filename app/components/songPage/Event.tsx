@@ -2,7 +2,6 @@ import { EventType } from "@/app/types/types";
 import Link from "next/link";
 
 export default function Event({ eventData }: { eventData: EventType }) {
-  console.log(eventData);
   const date = new Date(
     eventData.dates.start?.dateTime ?? eventData.dates.start.localDate
   );
@@ -25,8 +24,8 @@ export default function Event({ eventData }: { eventData: EventType }) {
 
   return (
     <Link href={eventData.url}>
-      <div className="flex items-center gap-4 overflow-hidden hover:bg-slate-500 p-2 rounded-lg">
-        <div className="p-2 pr-4 pl-4 bg-slate-700 text-center flex flex-col justify-center items-center rounded-lg w-20">
+      <div className="flex items-center gap-4 overflow-hidden hover:bg-spotify-gray p-2 rounded-lg hover:underline">
+        <div className="p-2 pr-4 pl-4 bg-spotify-lightGray text-center flex flex-col justify-center items-center rounded-lg w-20">
           <p className="text-[1.25rem]">{formattedDate.slice(0, 4)}</p>
           <p className="font-bold text-[1.4rem]"> {formattedDate.slice(-2)}</p>
         </div>

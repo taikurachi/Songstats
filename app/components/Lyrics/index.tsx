@@ -4,14 +4,8 @@ import { fetchLyrics } from "@/app/utilsFn/fetchLyrics";
 import convertToRGB from "@/app/utilsFn/colorFn/convertToRGB";
 import LyricsAnalysis from "./LyricsAnalysis";
 import Icon from "../utils/Icon";
-import { animate, progress } from "motion";
+import { type SongDetails } from "@/app/types/types";
 
-type SongDetails = {
-  songName: string;
-  albumName: string;
-  isrc: string;
-  artistName: string;
-};
 const calcHighlightColor = (dominantColor: number[]) => {
   let topChannel = 0; // 0 is red, 1 is green, 2 is blue
   for (let i = 0; i < dominantColor.length; i++) {

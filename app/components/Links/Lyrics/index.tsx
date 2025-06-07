@@ -1,5 +1,3 @@
-"use client";
-import setColorCookie from "@/app/actions";
 import convertToRGB from "@/app/utilsFn/colorFn/convertToRGB";
 import Link from "next/link";
 
@@ -12,29 +10,12 @@ type LyricsLinkProps = {
   artistName: string;
 };
 
-export default function LyricsLink({
-  dominantColor,
-  isrc,
-  id,
-  albumName,
-  songName,
-  artistName,
-}: LyricsLinkProps) {
-  const handleClick = () => {
-    setColorCookie(dominantColor, id);
-
-    sessionStorage.setItem(
-      `songDetails`,
-      JSON.stringify({ isrc, albumName, artistName, songName })
-    );
-  };
-
+export default function LyricsLink({ dominantColor, id }: LyricsLinkProps) {
   return (
     <Link
       style={{ background: convertToRGB(dominantColor) }}
-      onClick={handleClick}
       href={`/songs/${id}/lyrics`}
-      className="rounded-xl flex-1 p-4 h-48 text-2xl font-bold"
+      className="rounded-xl flex-1 p-4 h-48 text-xl font-bold"
     >
       Lyrics
     </Link>

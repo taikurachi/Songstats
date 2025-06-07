@@ -45,6 +45,14 @@ export type EventType = {
     venues: { city: { name: string }; name: string }[];
   };
 };
+
+export type SongDetails = {
+  songName: string;
+  albumName: string;
+  isrc: string;
+  artistName: string;
+};
+
 export type iconVariants =
   | "home"
   | "discover"
@@ -59,4 +67,23 @@ export type iconVariants =
   | "switch"
   | "arrow"
   | "perplexity"
-  | "save";
+  | "save"
+  | "effects";
+
+export type VideoItem = {
+  title: string;
+  url: string;
+  channel: string;
+  duration: string;
+  views: string;
+  thumbnail: string;
+  video_id: string;
+};
+
+export type ApiResponse = {
+  query: string;
+  total_results: number;
+  videos: VideoItem[];
+  timestamp?: string;
+  error?: string;
+};

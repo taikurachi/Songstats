@@ -33,12 +33,14 @@ export default function MoreBy({ songData }: { songData: SongType }) {
             {songData.artists[artistIndex] &&
               songData.artists[artistIndex].name}
           </h3>
-          <span
-            className="hover:underline cursor-pointer"
-            onClick={handleArtistSwitch}
-          >
-            Switch artist
-          </span>
+          {songData.artists.length > 1 && (
+            <span
+              className="hover:underline cursor-pointer"
+              onClick={handleArtistSwitch}
+            >
+              Switch artist
+            </span>
+          )}
         </div>
         <div className="flex ml-[-12px] mt-3">
           {artistSongData.map((song: SongType, index: number) => (
