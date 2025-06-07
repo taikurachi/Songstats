@@ -192,7 +192,7 @@ export default function RelatedMedia({ dominantColor }: RelatedMediaProps) {
   }
 
   return (
-    <div className="">
+    <div className="w-full">
       <div
         className="pl-8 pb-8 pt-32"
         style={{
@@ -201,82 +201,68 @@ export default function RelatedMedia({ dominantColor }: RelatedMediaProps) {
       >
         <h2 className="text-8xl font-extrabold mb-2">Related Media</h2>
       </div>
-
-      {videos.length > 0 ? (
-        <div
-          style={{
-            background: `linear-gradient(to bottom, ${convertToRGB(
-              JSON.parse(dominantColor)
-            )}, transparent 12%, transparent 100%)`,
-          }}
-        >
-          <div className="px-8 pt-7 pb-8 flex gap-2">
-            <div
-              onClick={() => handleFilter("all")}
-              className="rounded-[20px] px-4 py-1 text-[14px] font-medium border border-gray-300 hover:border-white cursor-pointer hover:scale-102"
-            >
-              All videos
-            </div>
-            <div
-              onClick={() => handleFilter("lyrics")}
-              className="rounded-[20px] border border-gray-300 hover:border-white px-3 py-1 w-fit flex gap-2 font-medium text-[14px] hover:scale-102 cursor-pointer transition-all"
-            >
-              <Icon variant="lyrics" size={16} />
-              Lyrics
-            </div>
-            <div
-              onClick={() => handleFilter("remix")}
-              className="rounded-[20px] border border-gray-300 hover:border-white px-3 py-1 w-fit flex gap-2 font-medium text-[14px] hover:scale-102 cursor-pointer transition-all"
-            >
-              <Icon variant="lyrics" size={16} />
-              Remix
-            </div>
-            <div
-              onClick={() => handleFilter("effects")}
-              className="rounded-[20px] border border-gray-300 hover:border-white px-3 py-1 w-fit flex gap-2 font-medius text-[14px] hover:scale-102 cursor-pointer transition-all"
-            >
-              <Icon variant="effects" size={16} />
-              Effects
-            </div>
-            <div className="rounded-[20px] px-4 py-1 text-[14px] font-extralight bg-spotify-gray bg-opacity-25">
-              {videos.length} Videos
-            </div>
-          </div>
-          <p className="px-8 mb-2 mt-6">Discover related content</p>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 px-8 pb-8">
-            {videos.map((video, index) => (
-              <VideoCard key={`${video.video_id}-${index}`} video={video} />
-            ))}
-          </div>{" "}
-        </div>
-      ) : (
-        <div className="text-center py-12">
-          <div className="mb-4 text-gray-400">
-            <svg
-              className="mx-auto h-12 w-12"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"
-              />
-            </svg>
-          </div>
-          <p className="text-gray-600 mb-4">No videos found for this song</p>
-          <button
-            onClick={() =>
-              fetchMusicVideos(songDetails.songName, songDetails.artistName)
-            }
-            className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+      {
+        <>
+          <div
+            style={{
+              background: `linear-gradient(to bottom, ${convertToRGB(
+                JSON.parse(dominantColor)
+              )}, transparent 88%, transparent 100%)`,
+            }}
           >
-            Search Again
-          </button>
-        </div>
-      )}
+            <div className="flex justify-between px-8">
+              <div className="pt-7 pb-8 flex gap-2">
+                <button
+                  onClick={() => handleFilter("all")}
+                  className="rounded-[20px] px-4 py-1 text-[14px] font-medium border border-gray-300 hover:border-white cursor-pointer hover:scale-102"
+                >
+                  All videos
+                </button>
+                <button
+                  onClick={() => handleFilter("lyrics")}
+                  className="rounded-[20px] border border-gray-300 hover:border-white px-4 py-1 w-fit flex gap-2 font-medium text-[14px] hover:scale-102 cursor-pointer transition-all"
+                >
+                  <Icon variant="lyrics" size={16} />
+                  Lyrics
+                </button>
+                <button
+                  onClick={() => handleFilter("remix")}
+                  className="rounded-[20px] border border-gray-300 hover:border-white px-4 py-1 w-fit flex gap-2 font-medium text-[14px] hover:scale-102 cursor-pointer transition-all"
+                >
+                  <Icon variant="remix" size={13} />
+                  Remix
+                </button>
+                <button
+                  onClick={() => handleFilter("effects")}
+                  className="rounded-[20px] border border-gray-300 hover:border-white px-4 py-1 w-fit flex gap-2 font-medius text-[14px] hover:scale-102 cursor-pointer transition-all"
+                >
+                  <Icon variant="effects" size={16} />
+                  Effects
+                </button>
+                <div className="rounded-[20px] px-4 py-1 text-[14px] font-extralight bg-spotify-gray bg-opacity-25">
+                  {videos.length} Videos
+                </div>
+              </div>
+              <Icon
+                variant="grid"
+                size={16}
+                className="opacity-80 hover:opacity-100 hover:scale-102 transition-all cursor-pointer"
+              />
+            </div>
+            {videos.length > 0 ? (
+              <p className="px-8 mb-2 mt-6">Discover related content</p>
+            ) : (
+              <p className="px-8 mb-2 mt-6">No videos were found.</p>
+            )}
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 px-8 pb-8">
+            {videos.length > 0 &&
+              videos.map((video, index) => (
+                <VideoCard key={`${video.video_id}-${index}`} video={video} />
+              ))}
+          </div>
+        </>
+      }
     </div>
   );
 }

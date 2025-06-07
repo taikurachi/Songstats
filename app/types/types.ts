@@ -64,11 +64,13 @@ export type iconVariants =
   | "details"
   | "cancel"
   | "visit"
-  | "switch"
+  | "remix"
   | "arrow"
   | "perplexity"
   | "save"
-  | "effects";
+  | "effects"
+  | "grid"
+  | "list";
 
 export type VideoItem = {
   title: string;
