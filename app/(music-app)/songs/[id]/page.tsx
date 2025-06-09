@@ -6,8 +6,6 @@ import { fetchColor } from "@/app/utilsFn/fetchColor";
 import getSongLength from "@/app/utilsFn/getSongLength";
 import getColorPalette from "@/app/utilsFn/colorFn/getColorPalette";
 import { type ArtistType } from "@/app/types/types";
-import LyricsLink from "@/app/components/Links/Lyrics";
-import RelatedMediaLink from "@/app/components/Links/RelatedMedia";
 import convertToRGB from "@/app/utilsFn/colorFn/convertToRGB";
 import Icon from "@/app/components/utils/Icon";
 import Link from "next/link";
@@ -15,6 +13,7 @@ import Events from "@/app/components/songPage/Events";
 import MoreBy from "@/app/components/songPage/MoreBy";
 import SessionStorageProvider from "@/app/components/utils/SessionStorageProvider";
 import CookieSetter from "@/app/components/utils/CookieSetter";
+import checkLuminance from "@/app/utilsFn/colorFn/checkLuminance";
 
 export default async function SongPage({ params }: { params: { id: string } }) {
   const { id } = await params;
@@ -28,19 +27,22 @@ export default async function SongPage({ params }: { params: { id: string } }) {
     songData.artists.map((artist: ArtistType) => artist.id),
     token
   );
-  const { dominantColor } = await fetchColor(songData.album.images[0].url);
-
+  const { dominantColorArr }: { dominantColorArr: number[] } = await fetchColor(
+    songData.album.images[0].url
+  );
+  const dominantColorRGB: string = convertToRGB(dominantColorArr);
   return (
-    <div className="col-start-2 row-start-2 overflow-y-auto bg-[#121212] min-h-[calc(100vh-64px)]">
+    <div className="col-start-2 row-start-2 overflow-y-auto bg-[#121212] min-h-[calc(100vh-64px)] rounded-lg">
       <SessionStorageProvider
         albumName={songData.album.name}
         songName={songData.name}
         artistName={songData.artists[0].name}
+        isrc={songData.external_ids.isrc}
       />
-      <CookieSetter dominantColor={dominantColor} id={id} />
+      <CookieSetter dominantColor={dominantColorRGB} id={id} />
       <main
         style={{
-          background: getColorPalette(dominantColor),
+          background: getColorPalette(dominantColorRGB),
         }}
         className="flex gap-10 max-w-[1800px] pl-8 pb-8 pt-12"
       >
@@ -104,17 +106,13 @@ export default async function SongPage({ params }: { params: { id: string } }) {
       <div
         className="p-8"
         style={{
-          background: `linear-gradient(to bottom, ${convertToRGB(
-            dominantColor
-          )}, transparent 16%, transparent 100%)`,
+          background: `linear-gradient(to bottom, ${dominantColorRGB}, transparent 16%, transparent 100%)`,
         }}
       >
         <div className="flex gap-6">
-          {/* spotify play button that opens link to song in open.spotify */}
-          {/* save button that saves to local storage  */}
           <Link
             href={songData.external_urls.spotify}
-            className="bg-[#1CD760] rounded-full w-[68px] h-[68px] flex justify-center items-center hover:scale-102 cursor-pointer "
+            className="bg-spotify-green rounded-full w-[68px] h-[68px] flex justify-center items-center hover:scale-102 cursor-pointer "
           >
             <Icon variant="play" size={22} className="ml-1" />
           </Link>
@@ -127,22 +125,22 @@ export default async function SongPage({ params }: { params: { id: string } }) {
         <div className="mt-10">
           <h3 className="font-bold text-2xl">Analyze</h3>
           <div className="flex gap-4 mt-4">
-            <LyricsLink
-              id={id}
-              isrc={songData.external_ids.isrc}
-              dominantColor={dominantColor}
-              albumName={songData.album.name}
-              artistName={artistData[0].name}
-              songName={songData.name}
-            />
-            <RelatedMediaLink id={id} dominantColor={dominantColor} />
-            <div
-              style={{ backgroundColor: convertToRGB(dominantColor) }}
-              className="flex-1 p-4 h-48 rounded-xl"
-            >
-              details link
-            </div>
-            {/* <SimilarSongsLink /> */}
+            {Object.entries({
+              lyrics: "Lyrics",
+              related: "Related Media",
+              details: "Details",
+            }).map(([key, value], index: number) => (
+              <Link
+                key={index}
+                style={{ background: dominantColorRGB }}
+                href={`/songs/${id}/${key}`}
+                className={`rounded-xl flex-1 p-4 h-52 text-xl font-bold ${
+                  checkLuminance(dominantColorArr) ? "text-white" : "text-black"
+                }`}
+              >
+                {value}
+              </Link>
+            ))}
           </div>
         </div>
         <Events songData={songData} />

@@ -8,6 +8,7 @@ export default function AppLayout({ children }: { children: ReactNode }) {
     <SpotifyGrid>
       <Header />
       <Sidebar />
+
       {children}
     </SpotifyGrid>
   );

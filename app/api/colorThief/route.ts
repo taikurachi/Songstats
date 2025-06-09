@@ -19,8 +19,12 @@ export async function GET(req: NextRequest) {
 
     const img = new ColorThief();
     await img.loadImage(imageBuffer, "image/jpeg");
-    const dominantColor = img.getColor();
-    return NextResponse.json({ dominantColor });
+    const dominantColorArr = img.getColor();
+    // if color is too close to black, we redirect to gray
+    if (dominantColorArr.every((channel: number) => channel < 30)) {
+      return NextResponse.json({ dominantColorArr: [80, 80, 80] });
+    }
+    return NextResponse.json({ dominantColorArr });
   } catch (error) {
     return NextResponse.json({ error });
   }

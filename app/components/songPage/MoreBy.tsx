@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import SongMD from "../utils/SongMD";
 import { fetchArtistSongData } from "@/app/utilsFn/fetchArtistSongData";
 import { useToken } from "@/app/context/tokenContext";
+import { motion } from "motion/react";
 
 export default function MoreBy({ songData }: { songData: SongType }) {
   const [artistSongData, setArtistSongData] = useState([]);
@@ -30,8 +31,15 @@ export default function MoreBy({ songData }: { songData: SongType }) {
         <div className="flex justify-between">
           <h3 className="font-bold text-2xl">
             More by{" "}
-            {songData.artists[artistIndex] &&
-              songData.artists[artistIndex].name}
+            <motion.span
+              key={artistIndex}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+            >
+              {songData.artists[artistIndex] &&
+                songData.artists[artistIndex].name}
+            </motion.span>
           </h3>
           {songData.artists.length > 1 && (
             <span

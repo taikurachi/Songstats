@@ -9,11 +9,14 @@ import {
 } from "react";
 import { motion } from "motion/react";
 import Icon from "../../utils/Icon";
+import convertToColorArr from "@/app/utilsFn/colorFn/convertToColorArr";
+import checkLuminance from "@/app/utilsFn/colorFn/checkLuminance";
 type AnalysisData = {
   lyrics_analysis: Record<string, { analysis: string; themes: string }>;
 };
 type LyricsAnalysisProps = {
   lyrics: string[];
+  dominantColor: string;
   songDetails: {
     artistName: string;
     songName: string;
@@ -26,6 +29,7 @@ type LyricsAnalysisProps = {
 };
 export default function LyricsAnalysis({
   songDetails,
+  dominantColor,
   lyrics,
   lyricsAnalysis,
   setLyricsAnalysis,
@@ -68,7 +72,11 @@ export default function LyricsAnalysis({
               >
                 <p
                   style={{ background: `${convertToRGB(highlightedColor)}` }}
-                  className="mb-8 w-fit"
+                  className={`mb-8 w-fit ${
+                    checkLuminance(convertToColorArr(dominantColor))
+                      ? "text-white"
+                      : "text-black"
+                  }`}
                 >
                   {line}
                 </p>

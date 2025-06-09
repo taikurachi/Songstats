@@ -1,7 +1,7 @@
 import RelatedMedia from "@/app/components/RelatedMedia";
 import { cookies } from "next/headers";
 
-export default async function LyricsPage({
+export default async function RelatedPage({
   params,
 }: {
   params: { id: string };

@@ -1,11 +1,9 @@
 "use server";
 import { cookies } from "next/headers";
 
-const setColorCookie = async (dominantColor: number[], id: string) => {
+const setColorCookie = async (dominantColor: string, id: string) => {
   const cookieStore = await cookies();
-  const colorString = JSON.stringify(dominantColor);
-
-  cookieStore.set(`bg_color_${id}`, colorString, {
+  cookieStore.set(`bg_color_${id}`, dominantColor, {
     httpOnly: true,
     path: "/",
     maxAge: 60 * 60 * 24 * 7,

@@ -70,7 +70,11 @@ export type iconVariants =
   | "save"
   | "effects"
   | "grid"
-  | "list";
+  | "list"
+  | "related-icon"
+  | "minimize"
+  | "spotify"
+  | "browse";
 
 export type VideoItem = {
   title: string;

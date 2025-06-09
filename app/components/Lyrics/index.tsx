@@ -5,13 +5,17 @@ import convertToRGB from "@/app/utilsFn/colorFn/convertToRGB";
 import LyricsAnalysis from "./LyricsAnalysis";
 import Icon from "../utils/Icon";
 import { type SongDetails } from "@/app/types/types";
+import convertToColorArr from "@/app/utilsFn/colorFn/convertToColorArr";
+import checkLuminance from "@/app/utilsFn/colorFn/checkLuminance";
 
-const calcHighlightColor = (dominantColor: number[]) => {
+const calcHighlightColor = (dominantColor: string) => {
+  const dominantColorArr: number[] = convertToColorArr(dominantColor);
   let topChannel = 0; // 0 is red, 1 is green, 2 is blue
-  for (let i = 0; i < dominantColor.length; i++) {
-    topChannel = dominantColor[i] > dominantColor[topChannel] ? i : topChannel;
+  for (let i = 0; i < dominantColorArr.length; i++) {
+    topChannel =
+      dominantColorArr[i] > dominantColorArr[topChannel] ? i : topChannel;
   }
-  const copiedColorProfile = [...dominantColor];
+  const copiedColorProfile = [...dominantColorArr];
   copiedColorProfile[topChannel] += 50;
   if (copiedColorProfile[topChannel] > 255)
     copiedColorProfile[topChannel] = 255;
@@ -65,12 +69,11 @@ export default function Lyrics({ dominantColor }: { dominantColor: string }) {
     };
     fetchSongsLyrics();
   }, [songDetails?.isrc]);
-  const parsedDominantColor = JSON.parse(dominantColor);
-  const highlightedColor = calcHighlightColor(parsedDominantColor);
+
+  const highlightedColor = calcHighlightColor(dominantColor);
 
   const findElementRef = (line: string) => {
     const cleanedLine = line.toLowerCase().replace(/["'""'']/g, "");
-
     const elementArr = Object.entries(contentRefs.current).find(
       ([key, element]) => {
         const cleanedKey = key.toLowerCase().replace(/["'""'']/g, "");
@@ -104,8 +107,8 @@ export default function Lyrics({ dominantColor }: { dominantColor: string }) {
   return (
     <>
       <main
-        className="p-8 h-full flex-1 rounded-lg overflow-y-scroll "
-        style={{ background: convertToRGB(parsedDominantColor) }}
+        className="p-8 h-full flex-1 rounded-lg overflow-y-scroll flex flex-col"
+        style={{ background: dominantColor }}
       >
         {isLoading && <div>Loading...</div>}
         {!isLoading && lyrics.length === 0 && (
@@ -128,6 +131,10 @@ export default function Lyrics({ dominantColor }: { dominantColor: string }) {
               }}
               className={`w-fit ${
                 lyricsAnalysis && wasAnalysisFound(line) && "cursor-pointer"
+              } ${
+                checkLuminance(convertToColorArr(dominantColor))
+                  ? "text-white"
+                  : "text-black"
               }`}
             >
               {line}
@@ -135,14 +142,22 @@ export default function Lyrics({ dominantColor }: { dominantColor: string }) {
           )
         )}
         {lyrics.length > 0 && (
-          <div className="flex items-center gap-2">
-            <p className="text-sm font-extralight opacity-80">
+          <div className="flex items-center gap-2 mt-auto">
+            <p
+              className={`text-sm font-extralight opacity-80 ${
+                checkLuminance(convertToColorArr(dominantColor))
+                  ? "text-white"
+                  : "text-black"
+              }`}
+            >
               Lyrics provided my Musixmatch
             </p>
             <Icon
               variant="details"
               size={12}
-              className="opacity-80 hover:opacity-100 cursor-pointer"
+              className={`opacity-80 hover:opacity-100 cursor-pointer ${
+                !checkLuminance(convertToColorArr(dominantColor)) && "invert"
+              }`}
             />
           </div>
         )}
@@ -154,6 +169,7 @@ export default function Lyrics({ dominantColor }: { dominantColor: string }) {
         {lyrics.length > 0 && songDetails && (
           <LyricsAnalysis
             lyrics={lyrics}
+            dominantColor={dominantColor}
             songDetails={songDetails}
             lyricsAnalysis={lyricsAnalysis}
             setLyricsAnalysis={setLyricsAnalysis}

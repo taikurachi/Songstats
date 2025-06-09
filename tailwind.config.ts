@@ -21,6 +21,7 @@ export default {
           gray: "#1F1F1F",
           lightGray: "#2A2A2A",
           extraLightGray: "#A5A5A5",
+          green: "#1CD760",
         },
       },
       scale: {

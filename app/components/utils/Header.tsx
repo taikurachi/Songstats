@@ -34,14 +34,14 @@ export default function Header() {
     setSearchString(e.target.value);
 
   return (
-    <header className="sticky top-0 bg-black z-40 flex justify-between items-center px-8 w-full col-span-2">
+    <header className="sticky top-0 bg-black z-40 flex justify-between items-center px-4 w-full col-span-2">
       <QuickSearch />
-      <div className="flex justify-between w-full max-w-[1800px] mx-auto items-center">
+      <div className="flex justify-between w-full mx-auto items-center">
         <Link href="/">
           <Image
-            src="/spotify-logo.svg"
-            width={130}
-            height={80}
+            src="/spotify-icon.png"
+            width={32}
+            height={32}
             alt="spotify logo"
           />
         </Link>
@@ -61,12 +61,6 @@ export default function Header() {
 
               <input
                 ref={inputRef}
-                onBlur={() => {
-                  // setSearchString("");
-                  // setSongs([]);
-                  // setActiveInput(false);
-                }}
-                // onFocus={() => setActiveInput(true)}
                 type="text"
                 placeholder="What do you want to analyze?"
                 className={`outline-none bg-transparent w-[300px]`}
@@ -100,9 +94,9 @@ export default function Header() {
                 }}
               >
                 <Icon
-                  variant="home"
+                  variant="browse"
                   size={20}
-                  className="opacity-80 hover:opacity-100 transition-opacity"
+                  className="opacity-80 hover:opacity-100 transition-opacity cursor-pointer"
                 />
               </span>
             </div>

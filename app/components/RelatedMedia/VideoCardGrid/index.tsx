@@ -1,6 +1,7 @@
 import Image from "next/image";
 import { VideoItem } from "@/app/types/types";
-export default function VideoCard({ video }: { video: VideoItem }) {
+
+export default function VideoCardGrid({ video }: { video: VideoItem }) {
   const handleVideoClick = () => {
     console.log("Opening video:", video.url);
     window.open(video.url, "_blank", "noopener,noreferrer");

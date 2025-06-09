@@ -17,7 +17,11 @@ export default function Song({ song, usage, index, ref }: SongProps) {
     <Link
       ref={ref}
       href={`/songs/${song.id}`}
-      className="w-full hover:bg-spotify-extraLightGray p-4 rounded-lg focus:bg-spotify-lightGray focus:outline-none"
+      className={`w-full ${
+        usage === "quick"
+          ? "hover:bg-spotify-lightGray focus:bg-spotify-lightGray"
+          : "hover:bg-spotify-extraLightGray focus:bg-spotify-extraLightGray"
+      } p-4 rounded-lg focus:outline-none`}
     >
       <motion.div
         className="flex gap-4 items-center"
