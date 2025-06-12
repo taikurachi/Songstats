@@ -9,8 +9,8 @@ type SongSMProps = {
 
 export default function SongSM({ song, index }: SongSMProps) {
   return (
-    <Link href={`http://localhost:3000/songs/${song.id}`}>
-      <div className="flex gap-4 justify-start items-center hover:bg-slate-50 w-full">
+    <Link href={`/songs/${song.id}`}>
+      <div className="flex gap-4 justify-start items-center w-full">
         <span className="w-5">{index + 1}</span>
         <Image
           src={song.album.images[2].url}

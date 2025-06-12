@@ -94,7 +94,6 @@ Select 5-8 of the most impactful lines from the lyrics and provide thoughtful an
         }
 
         const jsonData = JSON.parse(cleanContent);
-
         return new Response(JSON.stringify(jsonData), {
           status: 200,
           headers: { "Content-Type": "application/json" },

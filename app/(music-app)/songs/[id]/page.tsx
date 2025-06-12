@@ -14,6 +14,7 @@ import MoreBy from "@/app/components/songPage/MoreBy";
 import SessionStorageProvider from "@/app/components/utils/SessionStorageProvider";
 import CookieSetter from "@/app/components/utils/CookieSetter";
 import checkLuminance from "@/app/utilsFn/colorFn/checkLuminance";
+import LocalStorageProvider from "@/app/components/utils/LocalStorageProvider";
 
 export default async function SongPage({ params }: { params: { id: string } }) {
   const { id } = await params;
@@ -33,6 +34,7 @@ export default async function SongPage({ params }: { params: { id: string } }) {
   const dominantColorRGB: string = convertToRGB(dominantColorArr);
   return (
     <div className="col-start-2 row-start-2 overflow-y-auto bg-[#121212] min-h-[calc(100vh-64px)] rounded-lg">
+      <LocalStorageProvider songData={songData} />
       <SessionStorageProvider
         albumName={songData.album.name}
         songName={songData.name}

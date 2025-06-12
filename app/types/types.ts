@@ -54,6 +54,7 @@ export type SongDetails = {
 };
 
 export type iconVariants =
+  | "time"
   | "home"
   | "discover"
   | "download"
@@ -74,7 +75,8 @@ export type iconVariants =
   | "related-icon"
   | "minimize"
   | "spotify"
-  | "browse";
+  | "browse"
+  | "history";
 
 export type VideoItem = {
   title: string;
