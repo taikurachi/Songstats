@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import localFont from "next/font/local";
 import { TokenProvider } from "./context/tokenContext";
+import QueryProvider from "./components/providers/QueryProvider";
 
 const spotifyMix = localFont({
   src: [
@@ -42,7 +43,9 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${spotifyMix.variable} font-sans antialiased1`}>
-        <TokenProvider>{children}</TokenProvider>
+        <QueryProvider>
+          <TokenProvider>{children}</TokenProvider>
+        </QueryProvider>
       </body>
     </html>
   );

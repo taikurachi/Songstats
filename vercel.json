@@ -1,0 +1,18 @@
+{
+  "builds": [
+    {
+      "src": "package.json",
+      "use": "@vercel/next"
+    }
+  ],
+  "build": {
+    "env": {
+      "PYTHON_VERSION": "3.10.0"
+    }
+  },
+  "functions": {
+    "api/music-videos/**": {
+      "runtime": "python3.10"
+    }
+  }
+}

@@ -12,6 +12,9 @@ export type SongType = {
   external_ids: {
     isrc: string;
   };
+  external_urls: {
+    spotify: string;
+  };
   imageURL?: string;
 };
 

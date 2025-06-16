@@ -4,13 +4,15 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "next build && pip install -r requirements.txt",
     "start": "next start",
     "lint": "next lint"
   },
   "dependencies": {
     "@ai-sdk/openai": "^1.2.7",
     "@ai-sdk/react": "^1.1.25",
+    "@tanstack/react-query": "^5.80.7",
+    "@tanstack/react-query-devtools": "^5.80.7",
     "axios": "^1.7.9",
     "colorthief": "^2.6.0",
     "cross-env": "^7.0.3",
