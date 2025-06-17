@@ -22,6 +22,19 @@
       "@/*": ["./*"]
     }
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "app/utilsFn/debounce.js", "app/components/utils/P5Wrapper.js", "app/components/utils/WaveBackground.jsx", "app/components/utils/P5Wrapper.jsx", "app/components/utils/P5Wrapper.jsx", "app/components/utils/WaveBackground.jsx", "app/components/utils/P5Wrapper.js", "app/components/IntroAnimation/WaveBackground/index.js"],
+  "include": [
+    "next-env.d.ts",
+    "**/*.ts",
+    "**/*.tsx",
+    ".next/types/**/*.ts",
+    "app/utilsFn/debounce.js",
+    "app/components/utils/P5Wrapper.js",
+    "app/components/utils/WaveBackground.jsx",
+    "app/components/utils/P5Wrapper.jsx",
+    "app/components/utils/P5Wrapper.jsx",
+    "app/components/utils/WaveBackground.jsx",
+    "app/components/utils/P5Wrapper.js",
+    "app/components/intro-animation/wave-background/index.js"
+  ],
   "exclude": ["node_modules"]
 }

@@ -2,8 +2,8 @@
 import Link from "next/link";
 import Image from "next/image";
 import Icon from "./components/utils/Icon";
-import MainSearch from "./components/mainSearch/MainSearch";
-import WaveBackground from "./components/IntroAnimation/WaveBackground";
+import MainSearch from "./components/main-search/MainSearch";
+import WaveBackground from "./components/intro-animation/wave-background";
 export default function Home() {
   return (
     <>

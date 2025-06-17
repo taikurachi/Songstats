@@ -3,7 +3,7 @@ import { useRef, useEffect, useState, ChangeEvent } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import Icon from "./Icon";
-import QuickSearch from "../QuickSearch";
+import QuickSearch from "../quick-search";
 import { usePathname, useRouter } from "next/navigation";
 
 export default function Header() {

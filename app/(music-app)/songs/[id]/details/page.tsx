@@ -1,7 +1,7 @@
-import RelatedMedia from "@/app/components/related-media";
+import Details from "@/app/components/details";
 import { cookies } from "next/headers";
 
-export default async function RelatedPage({
+export default async function DetailsPage({
   params,
 }: {
   params: { id: string };
@@ -12,7 +12,7 @@ export default async function RelatedPage({
 
   return (
     <div className="row-start-2 col-start-2 rounded-xl font-bold text-2xl overflow-y-scroll flex h-full gap-2">
-      <RelatedMedia dominantColor={dominantColor} />
+      <Details dominantColor={dominantColor} />
     </div>
   );
 }

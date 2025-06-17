@@ -1,8 +1,8 @@
 import { useEffect, useState, useRef, ChangeEvent } from "react";
 import Icon from "../utils/Icon";
-import KeyboardNavigation from "./KeyboardNavigation";
+import KeyboardNavigation from "./keyboard-navigation";
 import { SongType } from "@/app/types/types";
-import Song from "../mainSearch/MainSearchSong";
+import Song from "../main-search/MainSearchSong";
 import { useToken } from "@/app/context/tokenContext";
 import { debouncedFetchSongs } from "@/app/utilsFn/fetchSongs";
 import { useRouter } from "next/navigation";

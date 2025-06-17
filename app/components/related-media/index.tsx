@@ -8,9 +8,9 @@ import {
   type ApiResponse,
   iconVariants,
 } from "@/app/types/types";
-import VideoCardGrid from "./VideoCardGrid";
+import VideoCardGrid from "./video-card-grid";
 import Icon from "../utils/Icon";
-import VideoCardList from "./VideoCardList";
+import VideoCardList from "./video-card-list";
 type RelatedMediaProps = {
   dominantColor: string;
 };

@@ -8,7 +8,7 @@ export const originalFetchColor = async (imageUrl: string) => {
         : "http://localhost:3000";
 
     const response = await fetch(
-      `${baseUrl}/api/colorThief?imageUrl=${encodeURIComponent(imageUrl)}`,
+      `${baseUrl}/api/color-thief?imageUrl=${encodeURIComponent(imageUrl)}`,
       {
         next: { revalidate: 86400 }, // Cache for 24 hours (colors never change)
       }

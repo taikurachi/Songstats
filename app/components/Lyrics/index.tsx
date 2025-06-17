@@ -2,7 +2,7 @@
 import { useEffect, useState, useRef } from "react";
 import { fetchLyrics } from "@/app/utilsFn/fetchLyrics";
 import convertToRGB from "@/app/utilsFn/colorFn/convertToRGB";
-import LyricsAnalysis from "./LyricsAnalysis";
+import LyricsAnalysis from "./lyrics-analysis";
 import Icon from "../utils/Icon";
 import { type SongDetails } from "@/app/types/types";
 import convertToColorArr from "@/app/utilsFn/colorFn/convertToColorArr";
