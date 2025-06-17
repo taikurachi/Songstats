@@ -4,7 +4,7 @@ import { SongType } from "@/app/types/types";
 import { fetchSongs } from "@/app/utilsFn/fetchSongs";
 import { use, useEffect, useState } from "react";
 import Image from "next/image";
-import SearchSong from "@/app/components/searchPage/SearchSong";
+import SearchSong from "@/app/components/search-page";
 import { fetchFeaturedSongs } from "@/app/utilsFn/fetchFeaturedSongs";
 import SongMD from "@/app/components/utils/SongMD";
 export default function Page({

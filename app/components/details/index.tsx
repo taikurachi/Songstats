@@ -24,7 +24,7 @@ export default function Details({ dominantColor }: { dominantColor: string }) {
 
   // Constants after we know songDetails exists
   const titleClass =
-    songDetails.name.length > 10 ? "text-5xl mb-2" : "text-6xl mb-4";
+    songDetails.name.length > 10 ? "text-4xl mb-2" : "text-5xl mb-4";
   const releaseYear = songDetails.album.release_date.slice(0, 4);
   const songLength = getSongLength(songDetails.duration_ms);
   const artistNames = songDetails.artists
@@ -33,8 +33,8 @@ export default function Details({ dominantColor }: { dominantColor: string }) {
 
   return (
     <div className="p-8 w-full mr-2 rounded-lg bg-spotify-darkGray">
-      <main className="flex gap-10 items-end">
-        <div className="size-36 relative shadow-5xl hover:scale-102">
+      <main className="flex gap-6 items-end">
+        <div className="size-20 relative shadow-5xl hover:scale-102">
           <Image
             className="rounded-md"
             src={songDetails.album.images[0].url}
@@ -44,9 +44,8 @@ export default function Details({ dominantColor }: { dominantColor: string }) {
           />
         </div>
         <div className="flex flex-col justify-end">
-          <p className="mb-2 text-lg font-extralight">Single</p>
           <h1 className={`font-extrabold ${titleClass}`}>{songDetails.name}</h1>
-          <div className="flex items-center gap-2 text-lg font-extralight">
+          <div className="flex items-center gap-2 text-[14px] font-extralight">
             <p className="font-medium">{artistNames}</p>
             <span className="opacity-80">·</span>
             <p className="opacity-80">{songDetails.album.name}</p>
@@ -57,39 +56,55 @@ export default function Details({ dominantColor }: { dominantColor: string }) {
           </div>
         </div>
       </main>
-      <div className="flex gap-3 mt-14 h-[160px]">
+      <div className="flex gap-3 mt-14 h-[184px]">
         <div
           style={{ background: dominantColor }}
           className="p-6 flex flex-col rounded-lg flex-1"
         >
           <div className="flex justify-between">
             <h4>Total Streams</h4>
-            <span>+ 10.1%</span>
+            {/* <span className="text-center flex items-center text-green-700 p-1 bg-transparent text-sm">
+              + 10.1%
+            </span> */}
           </div>
           <p className="opacity-70">Quantity</p>
-          <p className="font-black text-4xl mt-auto">123,000,000</p>
+          <p className="font-black text-5xl mt-auto">123,000,000</p>
         </div>
         <div
           style={{ background: dominantColor }}
           className="p-6 flex flex-1 rounded-lg"
         >
-          <div className="flex flex-col flex-1 border-r border-white">
+          <div className="flex flex-col flex-1 border-r border-white border-opacity-40">
             <h4>Song Score</h4>
             <p className="opacity-70">Quality</p>
-            <p className="mt-auto font-black text-5xl">90</p>
+            <div className="mt-auto font-black text-5xl w-fit inline">
+              90<span className="font-medium text-lg opacity-70"> / 100 </span>
+            </div>
           </div>
-          <div className="flex flex-col justify-between py-2 flex-1 items-end">
+          <div className="flex flex-col justify-between flex-1 items-end">
             <div className="w-[120px]">
               <span>{songDetails.popularity}</span>
-              <span className="opacity-70 text-lg ml-2">Popularity</span>
+              <span className="opacity-70 text-lg ml-2 hover:underline">
+                Popularity
+              </span>
+            </div>
+            <div className="w-[120px]">
+              <span>{songDetails.popularity}</span>
+              <span className="opacity-70 text-lg ml-2 hover:underline">
+                Popularity
+              </span>
             </div>
             <div className="w-[120px]">
               <span>90</span>
-              <span className="opacity-70 text-lg ml-2">Longevity</span>
+              <span className="opacity-70 text-lg ml-2 hover:underline">
+                Longevity
+              </span>
             </div>
             <div className="w-[120px]">
               <span>90</span>
-              <span className="opacity-70 text-lg ml-2">Lyrics</span>
+              <span className="opacity-70 text-lg ml-2 hover:underline">
+                Lyrics
+              </span>
             </div>
           </div>
         </div>
@@ -99,8 +114,8 @@ export default function Details({ dominantColor }: { dominantColor: string }) {
         >
           <h4>Most Streamed Country</h4>
           <p className="opacity-70">Global</p>
-          <div className="mt-auto flex gap-3">
-            <span>country</span>
+          <div className="mt-auto flex gap-4">
+            <Image src={"/us-flag.svg"} width={70} alt="us-flag" height={40} />
             <div>
               <p className="font-extralight text-sm">North America</p>
               <p className="text-lg">United States</p>
@@ -109,7 +124,7 @@ export default function Details({ dominantColor }: { dominantColor: string }) {
         </div>
       </div>
 
-      <div className="mt-14">Chart data</div>
+      <div className="mt-10">Chart data</div>
     </div>
   );
 }
