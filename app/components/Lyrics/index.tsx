@@ -4,7 +4,7 @@ import { fetchLyrics } from "@/app/utilsFn/fetchLyrics";
 import convertToRGB from "@/app/utilsFn/colorFn/convertToRGB";
 import LyricsAnalysis from "./lyrics-analysis";
 import Icon from "../utils/Icon";
-import { type SongDetails } from "@/app/types/types";
+import { type SongType } from "@/app/types/types";
 import convertToColorArr from "@/app/utilsFn/colorFn/convertToColorArr";
 import checkLuminance from "@/app/utilsFn/colorFn/checkLuminance";
 
@@ -24,7 +24,8 @@ const calcHighlightColor = (dominantColor: string) => {
 };
 
 export default function Lyrics({ dominantColor }: { dominantColor: string }) {
-  const [songDetails, setSongDetails] = useState<SongDetails | null>(null);
+  console.log("Lyrics component is rendering!");
+  const [songDetails, setSongDetails] = useState<SongType | null>(null);
   const [lyricsAnalysis, setLyricsAnalysis] = useState<{
     lyrics_analysis: Record<string, { analysis: string; themes: string }>;
   } | null>(null);
@@ -49,6 +50,7 @@ export default function Lyrics({ dominantColor }: { dominantColor: string }) {
   // Initialize song details from sessionStorage
   useEffect(() => {
     const storedDetails = sessionStorage.getItem("songDetails");
+
     if (storedDetails) {
       setSongDetails(JSON.parse(storedDetails));
     }
@@ -56,9 +58,10 @@ export default function Lyrics({ dominantColor }: { dominantColor: string }) {
 
   // Fetch lyrics
   useEffect(() => {
-    if (!songDetails?.isrc) return;
+    console.log(songDetails, "song details");
+    if (!songDetails?.external_ids?.isrc) return;
     const fetchSongsLyrics = async () => {
-      const lyricsData = await fetchLyrics(songDetails.isrc);
+      const lyricsData = await fetchLyrics(songDetails.external_ids.isrc);
       if (lyricsData) {
         const processedLyrics = lyricsData
           .slice(0, lyricsData.indexOf("*", 1))
@@ -68,7 +71,7 @@ export default function Lyrics({ dominantColor }: { dominantColor: string }) {
       setIsLoading(false);
     };
     fetchSongsLyrics();
-  }, [songDetails?.isrc]);
+  }, [songDetails]);
 
   const highlightedColor = calcHighlightColor(dominantColor);
 
@@ -170,7 +173,7 @@ export default function Lyrics({ dominantColor }: { dominantColor: string }) {
           <LyricsAnalysis
             lyrics={lyrics}
             dominantColor={dominantColor}
-            songDetails={songDetails}
+            songData={songDetails}
             lyricsAnalysis={lyricsAnalysis}
             setLyricsAnalysis={setLyricsAnalysis}
             highlightedColor={highlightedColor}

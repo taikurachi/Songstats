@@ -1,32 +1,20 @@
 "use client";
 
+import { SongType } from "@/app/types/types";
 import { useEffect } from "react";
 
 type SessionStorageProviderProps = {
-  albumName: string;
-  songName: string;
-  artistName: string;
-  isrc: string;
+  songData: SongType;
 };
 
 export default function SessionStorageProvider({
-  albumName,
-  songName,
-  artistName,
-  isrc,
+  songData,
 }: SessionStorageProviderProps) {
   useEffect(() => {
-    const songDetails = {
-      albumName,
-      songName,
-      artistName,
-      isrc,
-    };
-
-    if (songDetails) {
-      sessionStorage.setItem("songDetails", JSON.stringify(songDetails));
+    if (songData) {
+      sessionStorage.setItem("songDetails", JSON.stringify(songData));
     }
-  }, [albumName, artistName, songName, isrc]);
+  }, [songData]);
 
   return null;
 }

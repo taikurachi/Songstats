@@ -3,10 +3,10 @@
 import getColorPalette from "@/app/utilsFn/colorFn/getColorPalette";
 import { useEffect, useState } from "react";
 import {
-  type SongDetails,
   type VideoItem,
   type ApiResponse,
   iconVariants,
+  SongType,
 } from "@/app/types/types";
 import VideoCardGrid from "./video-card-grid";
 import Icon from "../utils/Icon";
@@ -18,7 +18,7 @@ type RelatedMediaProps = {
 type filterTypes = "all" | "remix" | "lyrics" | "effects";
 
 export default function RelatedMedia({ dominantColor }: RelatedMediaProps) {
-  const [songDetails, setSongDetails] = useState<SongDetails | null>(null);
+  const [songDetails, setSongDetails] = useState<SongType | null>(null);
   const [videos, setVideos] = useState<VideoItem[]>([]);
   const [originalVideos, setOriginalVideos] = useState<VideoItem[]>([]);
   const [activeFilter, setActiveFilter] = useState<filterTypes>("all");
@@ -37,8 +37,8 @@ export default function RelatedMedia({ dominantColor }: RelatedMediaProps) {
 
   // Fetch videos when song details are available
   useEffect(() => {
-    if (songDetails?.songName && songDetails?.artistName) {
-      fetchMusicVideos(songDetails.songName, songDetails.artistName);
+    if (songDetails?.name && songDetails.artists[0].name) {
+      fetchMusicVideos(songDetails.name, songDetails.artists[0].name);
     }
   }, [songDetails]);
 

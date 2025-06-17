@@ -11,24 +11,21 @@ import { motion } from "motion/react";
 import Icon from "../../utils/Icon";
 import convertToColorArr from "@/app/utilsFn/colorFn/convertToColorArr";
 import checkLuminance from "@/app/utilsFn/colorFn/checkLuminance";
+import { SongType } from "@/app/types/types";
 type AnalysisData = {
   lyrics_analysis: Record<string, { analysis: string; themes: string }>;
 };
 type LyricsAnalysisProps = {
   lyrics: string[];
   dominantColor: string;
-  songDetails: {
-    artistName: string;
-    songName: string;
-    albumName: string;
-  };
+  songData: SongType;
   lyricsAnalysis: AnalysisData | null;
   setLyricsAnalysis: Dispatch<SetStateAction<AnalysisData | null>>;
   highlightedColor: number[];
   contentRefs: RefObject<Record<string, HTMLElement | null>>;
 };
 export default function LyricsAnalysis({
-  songDetails,
+  songData,
   dominantColor,
   lyrics,
   lyricsAnalysis,
@@ -43,9 +40,9 @@ export default function LyricsAnalysis({
     const fetchLyricsAnalysis = async () => {
       try {
         const data = await fetchLyricsDetails(
-          songDetails.artistName,
-          songDetails.songName,
-          songDetails.albumName,
+          songData.artists[0].name,
+          songData.name,
+          songData.album.name,
           lyrics.join("")
         );
         setLyricsAnalysis(data);
@@ -56,7 +53,7 @@ export default function LyricsAnalysis({
     };
 
     fetchLyricsAnalysis();
-  }, [lyrics, loading, lyricsAnalysis, songDetails, setLyricsAnalysis]);
+  }, [lyrics, loading, lyricsAnalysis, songData, setLyricsAnalysis]);
 
   return (
     <>

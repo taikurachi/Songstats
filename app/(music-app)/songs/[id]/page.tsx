@@ -201,12 +201,7 @@ export default async function SongPage({ params }: { params: { id: string } }) {
     <div className="col-start-2 row-start-2 overflow-y-auto bg-[#121212] min-h-[calc(100vh-64px)] rounded-lg">
       {/* Providers load instantly */}
       <LocalStorageProvider songData={songData} />
-      <SessionStorageProvider
-        albumName={songData.album.name}
-        songName={songData.name}
-        artistName={songData.artists[0].name}
-        isrc={songData.external_ids.isrc}
-      />
+      <SessionStorageProvider songData={songData} />
       <CookieSetter dominantColor={dominantColorRGB} id={id} />
 
       {/* Header loads immediately */}

@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server";
 import axios from "axios";
 import { cookies } from "next/headers";
-
 export async function GET() {
   try {
     const refresh_token = process.env.SPOTIFY_REFRESH_TOKEN;
