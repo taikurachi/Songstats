@@ -29,7 +29,7 @@ export default function Sidebar() {
           const pathMap: Record<string, string> = {
             home: `/songs/${id}`,
             lyrics: `/songs/${id}/lyrics`,
-            "related-media": `/songs/${id}/related`,
+            "related-media": `/songs/${id}/related-media`,
             details: `/songs/${id}/details`,
           };
 

@@ -16,11 +16,13 @@ import checkLuminance from "@/app/utilsFn/colorFn/checkLuminance";
 import LocalStorageProvider from "@/app/components/providers/LocalStorageProvider";
 import ArtistProfiles from "@/app/components/artist-profiles";
 import { Suspense } from "react";
+import { fetchLyrics } from "@/app/utilsFn/fetchLyrics";
 
-// 🚀 OPTIMIZATION 1: Parallel Data Fetching
 async function getPageData(id: string, token: string) {
   try {
     const songData = await fetchSongData(id, token);
+    const lyrics = await fetchLyrics(songData.external_ids.isrc);
+    songData.lyrics = lyrics;
 
     if (!songData?.album?.images?.[0]?.url) {
       throw new Error("Song not found or no album image");
@@ -39,7 +41,6 @@ async function getPageData(id: string, token: string) {
   }
 }
 
-// 🚀 OPTIMIZATION 2: Memoized Components
 function SongHeader({
   songData,
   dominantColorRGB,
@@ -96,7 +97,6 @@ function SongHeader({
   );
 }
 
-// 🚀 OPTIMIZATION 3: Lazy Loading for Heavy Components
 function LazyContent({
   songData,
   dominantColorRGB,
@@ -188,7 +188,6 @@ export default async function SongPage({ params }: { params: { id: string } }) {
     return <div>Token is missing. There has been an error.</div>;
   }
 
-  // 🚀 OPTIMIZATION 4: Parallel data fetching
   const pageData = await getPageData(id, token);
 
   if (!pageData) {

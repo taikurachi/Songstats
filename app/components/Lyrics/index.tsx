@@ -30,7 +30,6 @@ export default function Lyrics({ dominantColor }: { dominantColor: string }) {
     lyrics_analysis: Record<string, { analysis: string; themes: string }>;
   } | null>(null);
   const [lyrics, setLyrics] = useState<string[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
   const contentRefs = useRef({});
   const containerRef = useRef<HTMLDivElement | null>(null);
 
@@ -58,20 +57,14 @@ export default function Lyrics({ dominantColor }: { dominantColor: string }) {
 
   // Fetch lyrics
   useEffect(() => {
-    console.log(songDetails, "song details");
-    if (!songDetails?.external_ids?.isrc) return;
-    const fetchSongsLyrics = async () => {
-      const lyricsData = await fetchLyrics(songDetails.external_ids.isrc);
-      if (lyricsData) {
-        const processedLyrics = lyricsData
-          .slice(0, lyricsData.indexOf("*", 1))
-          .split("\n");
-        setLyrics(processedLyrics);
-      }
-      setIsLoading(false);
-    };
-    fetchSongsLyrics();
-  }, [songDetails]);
+    const data: string | null = sessionStorage.getItem("songDetails");
+    if (!data) return;
+    const retriedvedLyrics = JSON.parse(data).lyrics;
+    const processedLyrics = retriedvedLyrics
+      .slice(0, retriedvedLyrics.indexOf("*", 1))
+      .split("\n");
+    setLyrics(processedLyrics);
+  }, []);
 
   const highlightedColor = calcHighlightColor(dominantColor);
 
@@ -113,10 +106,7 @@ export default function Lyrics({ dominantColor }: { dominantColor: string }) {
         className="p-8 h-full flex-1 rounded-lg overflow-y-scroll flex flex-col"
         style={{ background: dominantColor }}
       >
-        {isLoading && <div>Loading...</div>}
-        {!isLoading && lyrics.length === 0 && (
-          <div>No lyrics found just yet.</div>
-        )}
+        {lyrics.length === 0 && <div>Loading...</div>}
 
         {lyrics.map((line: string, index: number) =>
           line === "" ? (

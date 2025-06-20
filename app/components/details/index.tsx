@@ -4,14 +4,230 @@ import { SongType } from "@/app/types/types";
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import getSongLength from "@/app/utilsFn/getSongLength";
+import { fetchLyricsScore } from "@/app/utilsFn/fetchLyricsScore";
+import checkLuminance from "@/app/utilsFn/colorFn/checkLuminance";
+import convertToColorArr from "@/app/utilsFn/colorFn/convertToColorArr";
+
+// Type for MyStreamCount data
+type MyStreamCountData = {
+  track_id: string;
+  track_info: {
+    title: string;
+    artist: string;
+    total_streams: number;
+    release_date: string;
+    artwork_url: string;
+    album_name: string;
+  };
+  chart_data: {
+    chart_data: {
+      [date: string]: {
+        total: number;
+        daily: number;
+      };
+    };
+  };
+  related_tracks: Array<{
+    title: string;
+    artist: string;
+    track_id: string;
+  }>;
+  success: boolean;
+};
+
+type ChartDataPoint = {
+  date: string;
+  total: number;
+  daily: number;
+};
+
+type TimePeriod = "1M" | "3M" | "6M" | "YTD" | "All";
+
+const calculateLongevityScore = (
+  streamCountData: MyStreamCountData
+): string => {
+  console.log(streamCountData, "stream count data");
+  if (!streamCountData) return "";
+  const chartData = streamCountData.chart_data.chart_data;
+  const releaseDate = new Date(streamCountData.track_info.release_date);
+  const now = new Date();
+
+  // Convert chart data to array and sort by date
+
+  const dataPoints = Object.entries(chartData)
+    .map(([date, values]) => ({
+      date: new Date(date),
+      total: values.total,
+      daily: values.daily,
+    }))
+    .sort((a, b) => a.date.getTime() - b.date.getTime());
+
+  if (dataPoints.length < 7) return "50"; // Not enough data
+
+  // Calculate song age in months
+  const ageInMonths = Math.max(
+    1,
+    (now.getTime() - releaseDate.getTime()) / (1000 * 60 * 60 * 24 * 30)
+  );
+
+  // 1. Age Factor (0-25 points): Older songs with streams get bonus
+  let ageScore = 0;
+  if (ageInMonths >= 24) ageScore = 25; // 2+ years
+  else if (ageInMonths >= 12) ageScore = 20; // 1+ years
+  else if (ageInMonths >= 6) ageScore = 15; // 6+ months
+  else if (ageInMonths >= 3) ageScore = 10; // 3+ months
+  else ageScore = 5; // New songs get some points
+
+  // 2. Stream Consistency (0-30 points): Less variation = better longevity
+  const dailyStreams = dataPoints.map((d) => d.daily);
+  const avgDaily =
+    dailyStreams.reduce((sum, val) => sum + val, 0) / dailyStreams.length;
+  const variance =
+    dailyStreams.reduce((sum, val) => sum + Math.pow(val - avgDaily, 2), 0) /
+    dailyStreams.length;
+  const coefficientOfVariation = Math.sqrt(variance) / avgDaily;
+
+  let consistencyScore = 0;
+  if (coefficientOfVariation <= 0.3) consistencyScore = 30; // Very consistent
+  else if (coefficientOfVariation <= 0.5)
+    consistencyScore = 25; // Quite consistent
+  else if (coefficientOfVariation <= 0.8)
+    consistencyScore = 20; // Moderately consistent
+  else if (coefficientOfVariation <= 1.2)
+    consistencyScore = 15; // Somewhat inconsistent
+  else consistencyScore = 10; // Very inconsistent
+
+  // 3. Decay Rate Analysis (0-25 points): Slower decay = better longevity
+  let decayScore = 0;
+  if (dataPoints.length >= 30) {
+    const firstQuarter = dataPoints.slice(0, Math.floor(dataPoints.length / 4));
+    const lastQuarter = dataPoints.slice(-Math.floor(dataPoints.length / 4));
+
+    const firstAvg =
+      firstQuarter.reduce((sum, d) => sum + d.daily, 0) / firstQuarter.length;
+    const lastAvg =
+      lastQuarter.reduce((sum, d) => sum + d.daily, 0) / lastQuarter.length;
+    const retentionRate = lastAvg / firstAvg;
+
+    if (retentionRate >= 0.8) decayScore = 25; // Minimal decay
+    else if (retentionRate >= 0.6) decayScore = 20; // Slow decay
+    else if (retentionRate >= 0.4) decayScore = 15; // Moderate decay
+    else if (retentionRate >= 0.2) decayScore = 10; // Fast decay
+    else decayScore = 5; // Very fast decay
+  } else {
+    decayScore = 15; // Default for newer songs
+  }
+
+  // 4. Current Performance vs Peak (0-20 points): Maintaining relevance
+  const peakDaily = Math.max(...dailyStreams);
+  const recentAvg =
+    dailyStreams.slice(-7).reduce((sum, val) => sum + val, 0) / 7;
+  const currentVsPeak = recentAvg / peakDaily;
+
+  let currentScore = 0;
+  if (currentVsPeak >= 0.5) currentScore = 20; // Still at 50%+ of peak
+  else if (currentVsPeak >= 0.3) currentScore = 15; // 30-50% of peak
+  else if (currentVsPeak >= 0.15) currentScore = 10; // 15-30% of peak
+  else if (currentVsPeak >= 0.05) currentScore = 5; // 5-15% of peak
+  else currentScore = 0; // Below 5% of peak
+
+  const totalScore = Math.min(
+    100,
+    Math.round(ageScore + consistencyScore + decayScore + currentScore)
+  );
+  return totalScore.toString();
+};
+
+const calculateLyricsScore = async (lyrics: string): Promise<string> => {
+  const { score } = await fetchLyricsScore(lyrics);
+  return score;
+};
 
 export default function Details({ dominantColor }: { dominantColor: string }) {
   const [songDetails, setSongDetails] = useState<SongType | null>(null);
+  const [streamCountData, setStreamCountData] =
+    useState<MyStreamCountData | null>(null);
+  const [isLoadingStreamData, setIsLoadingStreamData] = useState(false);
+  const [hoveredLegend, setHoveredLegend] = useState<"daily" | "total" | null>(
+    null
+  );
+  const [streamDataError, setStreamDataError] = useState<string | null>(null);
+  const [selectedPeriod, setSelectedPeriod] = useState<TimePeriod>("All");
+  const [hoveredPoint, setHoveredPoint] = useState<{
+    index: number;
+    data: ChartDataPoint;
+    x: number;
+    y: number;
+  } | null>(null);
+  const [songScore, setSongScore] = useState<null | {
+    popularity: string;
+    longevity: string;
+    lyrics: string;
+  }>(null);
 
   useEffect(() => {
     const storedDetails = sessionStorage.getItem("songDetails");
     if (storedDetails) setSongDetails(JSON.parse(storedDetails));
   }, []);
+
+  useEffect(() => {
+    if (!streamCountData || !songDetails) return;
+
+    const getSongScore = async () => {
+      const popularity: string = songDetails.popularity;
+      const longevity: string = calculateLongevityScore(streamCountData);
+      const lyrics: string = await calculateLyricsScore(songDetails.lyrics); // Placeholder - lyrics not available
+
+      setSongScore({
+        popularity,
+        longevity,
+        lyrics,
+      });
+    };
+
+    getSongScore();
+  }, [streamCountData, songDetails]);
+
+  // Fetch MyStreamCount data when songDetails is available
+  useEffect(() => {
+    if (!songDetails?.id) return;
+
+    const fetchStreamData = async () => {
+      setIsLoadingStreamData(true);
+      setStreamDataError(null);
+
+      try {
+        const response = await fetch("/api/song-details", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            trackId: songDetails.id,
+          }),
+        });
+
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const data = await response.json();
+
+        if (data.success) {
+          setStreamCountData(data);
+        } else {
+          setStreamDataError(data.error || "Failed to fetch stream data");
+        }
+      } catch (error) {
+        console.error("Error fetching stream data:", error);
+        setStreamDataError("Failed to fetch stream data");
+      } finally {
+        setIsLoadingStreamData(false);
+      }
+    };
+
+    fetchStreamData();
+  }, [songDetails?.id]);
 
   // Early return if no data
   if (!songDetails) {
@@ -31,8 +247,109 @@ export default function Details({ dominantColor }: { dominantColor: string }) {
     .map((artist) => artist.name)
     .join("  ·  ");
 
+  // Process chart data for visualization
+  const getChartData = (): ChartDataPoint[] => {
+    if (!streamCountData?.chart_data?.chart_data) return [];
+
+    const data = streamCountData.chart_data.chart_data;
+    return Object.entries(data)
+      .map(([date, values]) => ({
+        date,
+        total: values.total,
+        daily: values.daily,
+      }))
+      .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+  };
+
+  // Filter data based on selected time period
+  const getFilteredData = (data: ChartDataPoint[]): ChartDataPoint[] => {
+    if (!data.length) return [];
+
+    const now = new Date();
+    const cutoffDate = new Date();
+
+    switch (selectedPeriod) {
+      case "1M":
+        cutoffDate.setMonth(now.getMonth() - 1);
+        break;
+      case "3M":
+        cutoffDate.setMonth(now.getMonth() - 3);
+        break;
+      case "6M":
+        cutoffDate.setMonth(now.getMonth() - 6);
+        break;
+      case "YTD":
+        cutoffDate.setMonth(0, 1); // January 1st of current year
+        break;
+      case "All":
+      default:
+        return data;
+    }
+
+    return data.filter((point) => new Date(point.date) >= cutoffDate);
+  };
+
+  // Format numbers for Y-axis
+  const formatChartNumber = (num: number): string => {
+    if (num >= 1000000) {
+      return Math.round(num / 1000000) + "M";
+    } else if (num >= 1000) {
+      return Math.round(num / 1000) + "K";
+    }
+    return num.toString();
+  };
+
+  // Get Y-axis scale for total streams
+  const getTotalYAxisScale = (data: ChartDataPoint[]): [number, number] => {
+    if (!data.length) return [0, 100000];
+
+    const maxTotal = Math.max(...data.map((d) => d.total));
+    const scale = Math.pow(10, Math.floor(Math.log10(maxTotal)));
+    const scaledMax = Math.ceil(maxTotal / scale) * scale;
+
+    return [0, scaledMax];
+  };
+
+  // Get Y-axis scale for daily streams
+  const getDailyYAxisScale = (data: ChartDataPoint[]): [number, number] => {
+    if (!data.length) return [0, 10000];
+
+    const maxDaily = Math.max(...data.map((d) => d.daily));
+    const scale = Math.pow(10, Math.floor(Math.log10(maxDaily)));
+    const scaledMax = Math.ceil(maxDaily / scale) * scale;
+
+    return [0, scaledMax];
+  };
+
+  // Generate chart points for SVG
+  const generateChartPath = (
+    data: ChartDataPoint[],
+    field: "total" | "daily",
+    yScale: [number, number],
+    width: number
+  ) => {
+    if (!data.length) return "";
+
+    const height = 200;
+    const [minY, maxY] = yScale;
+
+    const points = data.map((point, index) => {
+      // Handle single data point case
+      const x = data.length === 1 ? 0 : (index / (data.length - 1)) * width;
+      const y = height - ((point[field] - minY) / (maxY - minY)) * height;
+      return `${x},${y}`;
+    });
+
+    return `M ${points.join(" L ")}`;
+  };
+
+  const chartData = getChartData();
+  const filteredData = getFilteredData(chartData);
+  const totalYScale = getTotalYAxisScale(filteredData);
+  const dailyYScale = getDailyYAxisScale(filteredData);
+
   return (
-    <div className="p-8 w-full mr-2 rounded-lg bg-spotify-darkGray">
+    <div className="p-8 w-full mr-2 rounded-lg bg-spotify-darkGray flex flex-col">
       <main className="flex gap-6 items-end">
         <div className="size-20 relative shadow-5xl hover:scale-102">
           <Image
@@ -56,56 +373,73 @@ export default function Details({ dominantColor }: { dominantColor: string }) {
           </div>
         </div>
       </main>
-      <div className="flex gap-3 mt-14 h-[184px]">
+      <div
+        className={`flex gap-3 mt-14 h-[184px] ${
+          checkLuminance(convertToColorArr(dominantColor))
+            ? "text-white"
+            : "text-black"
+        }`}
+      >
         <div
           style={{ background: dominantColor }}
           className="p-6 flex flex-col rounded-lg flex-1"
         >
-          <div className="flex justify-between">
-            <h4>Total Streams</h4>
-            {/* <span className="text-center flex items-center text-green-700 p-1 bg-transparent text-sm">
-              + 10.1%
-            </span> */}
-          </div>
+          <h4>Total Streams</h4>
+
           <p className="opacity-70">Quantity</p>
-          <p className="font-black text-5xl mt-auto">123,000,000</p>
+          {streamCountData ? (
+            <p className="font-extrabold text-4xl mt-auto">
+              {streamCountData.track_info.total_streams.toLocaleString()}
+            </p>
+          ) : (
+            <div className="mt-auto w-56 h-8 bg-white bg-opacity-20 rounded animate-pulse"></div>
+          )}
         </div>
         <div
           style={{ background: dominantColor }}
           className="p-6 flex flex-1 rounded-lg"
         >
-          <div className="flex flex-col flex-1 border-r border-white border-opacity-40">
+          <div
+            className={`flex flex-col flex-1 border-r ${
+              checkLuminance(convertToColorArr(dominantColor))
+                ? "border-white"
+                : "border-black"
+            } border-opacity-40`}
+          >
             <h4>Song Score</h4>
             <p className="opacity-70">Quality</p>
-            <div className="mt-auto font-black text-5xl w-fit inline">
-              90<span className="font-medium text-lg opacity-70"> / 100 </span>
-            </div>
+            {songScore ? (
+              <div className="mt-auto font-extrabold text-4xl w-fit inline">
+                {Math.floor(
+                  Object.values(songScore).reduce(
+                    (a, b) => Number(a) + Number(b),
+                    0
+                  ) / 3
+                )}
+                <span className="font-medium text-lg opacity-70"> / 100 </span>
+              </div>
+            ) : (
+              <div className="mt-auto">
+                <div className="w-20 h-8 bg-white bg-opacity-20 rounded animate-pulse"></div>
+              </div>
+            )}
           </div>
           <div className="flex flex-col justify-between flex-1 items-end">
-            <div className="w-[120px]">
-              <span>{songDetails.popularity}</span>
-              <span className="opacity-70 text-lg ml-2 hover:underline">
-                Popularity
-              </span>
-            </div>
-            <div className="w-[120px]">
-              <span>{songDetails.popularity}</span>
-              <span className="opacity-70 text-lg ml-2 hover:underline">
-                Popularity
-              </span>
-            </div>
-            <div className="w-[120px]">
-              <span>90</span>
-              <span className="opacity-70 text-lg ml-2 hover:underline">
-                Longevity
-              </span>
-            </div>
-            <div className="w-[120px]">
-              <span>90</span>
-              <span className="opacity-70 text-lg ml-2 hover:underline">
-                Lyrics
-              </span>
-            </div>
+            {Object.entries(
+              songScore || { popularity: "", longevity: "", lyrics: "" }
+            ).map(([category, value], index) => (
+              <div className="w-[120px]" key={index}>
+                {value ? (
+                  <span>{value}</span>
+                ) : (
+                  <div className="inline-block w-8 h-4 bg-white bg-opacity-20 rounded animate-pulse"></div>
+                )}
+                <span className="opacity-70 text-lg ml-2 hover:underline">
+                  {category[0].toUpperCase() +
+                    category.slice(1, category.length + 1)}
+                </span>
+              </div>
+            ))}
           </div>
         </div>
         <div
@@ -124,7 +458,312 @@ export default function Details({ dominantColor }: { dominantColor: string }) {
         </div>
       </div>
 
-      <div className="mt-10">Chart data</div>
+      {/* Streaming Chart */}
+      <div className="mt-14 bg-spotify-darkGray rounded-lg flex-1 flex flex-col">
+        <div className="flex items-center justify-between mb-8">
+          <div className="flex items-center gap-4">
+            <h3 className=" font-semibold">Total streams</h3>
+            <div className="h-6 w-px bg-white opacity-30"></div>
+            <div className="flex gap-2">
+              {(["1M", "3M", "6M", "YTD", "All"] as TimePeriod[]).map(
+                (period) => (
+                  <button
+                    key={period}
+                    onClick={() => setSelectedPeriod(period)}
+                    className={`px-2 py-1 text-sm rounded transition-colors ${
+                      selectedPeriod === period
+                        ? "bg-white text-black font-medium"
+                        : "text-white opacity-60 hover:opacity-100"
+                    }`}
+                  >
+                    {period}
+                  </button>
+                )
+              )}
+            </div>
+          </div>
+          <div className="flex gap-2 relative">
+            <div
+              className="w-4 h-4 bg-cyan-400 rounded"
+              onMouseEnter={() => setHoveredLegend("total")}
+              onMouseLeave={() => setHoveredLegend(null)}
+            ></div>
+            <div
+              className="w-4 h-4 bg-purple-400 rounded"
+              onMouseEnter={() => setHoveredLegend("daily")}
+              onMouseLeave={() => setHoveredLegend(null)}
+            ></div>
+            {/* Fast custom tooltips */}
+            {hoveredLegend && (
+              <div className="absolute bottom-full right-0 mb-2 px-2 py-1 bg-black border border-white border-opacity-20 text-white text-sm sm:text-[16px] rounded whitespace-nowrap z-50">
+                {hoveredLegend === "total" ? "Total Streams" : "Daily Streams"}
+              </div>
+            )}
+          </div>
+        </div>
+
+        {isLoadingStreamData ? (
+          <div className="h-64 flex items-center justify-center">
+            <div className="text-white opacity-60">Loading chart data...</div>
+          </div>
+        ) : streamDataError ? (
+          <div className="h-64 flex items-center justify-center">
+            <div className="text-red-400">Error loading chart data</div>
+          </div>
+        ) : filteredData.length > 0 ? (
+          <div className="relative flex-1">
+            {/* Y-axis labels for total streams */}
+            <div className="absolute left-0 top-0 h-[90%] flex flex-col justify-between text-sm text-cyan-400 opacity-60">
+              {[
+                totalYScale[1],
+                totalYScale[1] * 0.75,
+                totalYScale[1] * 0.5,
+                totalYScale[1] * 0.25,
+                0,
+              ].map((value, index) => (
+                <div key={index} className="transform -translate-y-2">
+                  {formatChartNumber(value)}
+                </div>
+              ))}
+            </div>
+
+            {/* Y-axis labels for daily streams */}
+            <div className="absolute right-0 top-0 h-[90%] flex flex-col justify-between text-sm text-purple-400 opacity-60">
+              {[
+                dailyYScale[1],
+                dailyYScale[1] * 0.75,
+                dailyYScale[1] * 0.5,
+                dailyYScale[1] * 0.25,
+                0,
+              ].map((value, index) => (
+                <div
+                  key={index}
+                  className="transform -translate-y-2 text-right"
+                >
+                  {formatChartNumber(value)}
+                </div>
+              ))}
+            </div>
+
+            {/* Chart area */}
+            <div className="pl-14 pr-14 relative w-full h-full">
+              <svg
+                width="100%"
+                height="86%"
+                className="overflow-visible"
+                viewBox="0 0 1000 200"
+                preserveAspectRatio="none"
+                onMouseLeave={() => setHoveredPoint(null)}
+              >
+                {/* Grid lines */}
+                {[0, 0.25, 0.5, 0.75, 1].map((ratio, index) => (
+                  <line
+                    key={index}
+                    x1="0"
+                    y1={200 * ratio + ratio * 3}
+                    x2="1000"
+                    y2={200 * ratio + ratio * 3}
+                    stroke="white"
+                    strokeOpacity="0.1"
+                    strokeWidth="1"
+                  />
+                ))}
+
+                {/* Total streams line (cyan) */}
+                <path
+                  d={generateChartPath(
+                    filteredData,
+                    "total",
+                    totalYScale,
+                    1000
+                  )}
+                  fill="none"
+                  stroke="#22d3ee"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+
+                {/* Daily streams line (purple) */}
+                <path
+                  d={generateChartPath(
+                    filteredData,
+                    "daily",
+                    dailyYScale,
+                    1000
+                  )}
+                  fill="none"
+                  stroke="#c084fc"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+
+                {/* Hover points */}
+                {filteredData.map((point, index) => {
+                  const x = (index / (filteredData.length - 1)) * 1000;
+                  const totalY =
+                    200 -
+                    ((point.total - totalYScale[0]) /
+                      (totalYScale[1] - totalYScale[0])) *
+                      200;
+                  const dailyY =
+                    200 -
+                    ((point.daily - dailyYScale[0]) /
+                      (dailyYScale[1] - dailyYScale[0])) *
+                      200;
+
+                  return (
+                    <g key={index}>
+                      {/* Total streams hover point */}
+                      <circle
+                        cx={x}
+                        cy={totalY}
+                        r="8"
+                        fill="transparent"
+                        className="cursor-pointer"
+                        onMouseEnter={(e) => {
+                          const rect = e.currentTarget.getBoundingClientRect();
+                          setHoveredPoint({
+                            index,
+                            data: point,
+                            x: rect.left + window.scrollX,
+                            y: rect.top + window.scrollY - 10,
+                          });
+                        }}
+                      />
+                      {/* Daily streams hover point */}
+                      <circle
+                        cx={x}
+                        cy={dailyY}
+                        r="8"
+                        fill="transparent"
+                        className="cursor-pointer"
+                        onMouseEnter={(e) => {
+                          const rect = e.currentTarget.getBoundingClientRect();
+                          setHoveredPoint({
+                            index,
+                            data: point,
+                            x: rect.left + window.scrollX,
+                            y: rect.top + window.scrollY - 10,
+                          });
+                        }}
+                      />
+                      {/* Visible dots when hovered */}
+                      {hoveredPoint?.index === index && (
+                        <>
+                          <circle cx={x} cy={totalY} r="4" fill="#22d3ee" />
+                          <circle cx={x} cy={dailyY} r="4" fill="#c084fc" />
+                        </>
+                      )}
+                    </g>
+                  );
+                })}
+              </svg>
+
+              {/* Hover tooltip */}
+              {hoveredPoint && (
+                <div
+                  className="fixed z-50 bg-black border border-white border-opacity-20 rounded-lg p-3 text-sm sm:text-[16px] text-white shadow-lg pointer-events-none"
+                  style={{
+                    left: hoveredPoint.x - 100,
+                    top: hoveredPoint.y - 80,
+                  }}
+                >
+                  <div className="font-semibold mb-2">
+                    {new Date(hoveredPoint.data.date).toLocaleDateString(
+                      "en-US",
+                      {
+                        month: "short",
+                        day: "numeric",
+                        year: "numeric",
+                      }
+                    )}
+                  </div>
+                  {hoveredPoint?.data?.total != null && (
+                    <div className="flex items-center gap-2 mb-1">
+                      <div className="w-2 h-2 bg-cyan-400 rounded"></div>
+                      <span className="text-cyan-400">Total:</span>
+                      <span className="font-extralight">
+                        {hoveredPoint.data.total.toLocaleString()}
+                      </span>
+                    </div>
+                  )}
+                  {hoveredPoint?.data?.daily != null && (
+                    <div className="flex items-center gap-2">
+                      <div className="w-2 h-2 bg-purple-400 rounded"></div>
+                      <span className="text-purple-400">Daily:</span>
+                      <span className="font-extralight">
+                        {hoveredPoint.data.daily.toLocaleString()}
+                      </span>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* X-axis labels */}
+              <div className="flex justify-between mt-6 mr-8 text-sm text-white opacity-60">
+                {filteredData.length > 0 && (
+                  <>
+                    <span>
+                      {new Date(filteredData[0].date).toLocaleDateString(
+                        "en-US",
+                        { day: "2-digit", month: "short" }
+                      )}
+                    </span>
+                    {filteredData.length > 4 && (
+                      <>
+                        <span>
+                          {new Date(
+                            filteredData[
+                              Math.floor(filteredData.length * 0.25)
+                            ].date
+                          ).toLocaleDateString("en-US", {
+                            day: "2-digit",
+                            month: "short",
+                          })}
+                        </span>
+                        <span>
+                          {new Date(
+                            filteredData[
+                              Math.floor(filteredData.length * 0.5)
+                            ].date
+                          ).toLocaleDateString("en-US", {
+                            day: "2-digit",
+                            month: "short",
+                          })}
+                        </span>
+                        <span>
+                          {new Date(
+                            filteredData[
+                              Math.floor(filteredData.length * 0.75)
+                            ].date
+                          ).toLocaleDateString("en-US", {
+                            day: "2-digit",
+                            month: "short",
+                          })}
+                        </span>
+                      </>
+                    )}
+                    <span>
+                      {new Date(
+                        filteredData[filteredData.length - 1].date
+                      ).toLocaleDateString("en-US", {
+                        day: "2-digit",
+                        month: "short",
+                      })}
+                    </span>
+                  </>
+                )}
+              </div>
+            </div>
+          </div>
+        ) : (
+          <div className="h-64 flex items-center justify-center">
+            <div className="text-white opacity-60">No chart data available</div>
+          </div>
+        )}
+      </div>
     </div>
   );
 }

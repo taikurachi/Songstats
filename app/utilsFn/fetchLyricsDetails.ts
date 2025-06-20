@@ -9,7 +9,7 @@ export const fetchLyricsDetails = async (
   try {
     // using perplexity api
 
-    const response = await axios.post("/api/chat", {
+    const response = await axios.post("/api/lyrics-analysis", {
       lyrics,
       artistName,
       songName,
