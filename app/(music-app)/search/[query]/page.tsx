@@ -7,6 +7,7 @@ import Image from "next/image";
 import SearchSong from "@/app/components/search-page";
 import { fetchFeaturedSongs } from "@/app/utilsFn/fetchFeaturedSongs";
 import SongMD from "@/app/components/utils/SongMD";
+import Link from "next/link";
 export default function Page({
   params,
 }: {
@@ -50,19 +51,25 @@ export default function Page({
         {songs.length > 0 && (
           <div className="flex-1 flex flex-col">
             <h3 className="text-2xl font-semibold">Top Result</h3>
-            <div className="p-5 rounded-lg bg-spotify-gray mt-2 flex-1">
-              <Image
-                className="rounded-lg shadow-2xl"
-                width={songs[0].album.images[0].width / 7}
-                height={songs[0].album.images[0].width / 7}
-                src={songs[0].album.images[0].url}
-                alt={`${songs[0].name} album image`}
-              />
-              <h4 className="text-3xl font-bold mt-6">{songs[0].name}</h4>
-              <span className="opacity-80">Song</span>
-              <span>·</span>
-              <span>{songs[0].artists.map(({ name }) => name).join(", ")}</span>
-            </div>
+            <Link href={`/songs/${songs[0].id}`}>
+              <div className="p-5 rounded-lg bg-spotify-darkGray hover:bg-spotify-gray mt-2 flex-1">
+                <Image
+                  className="rounded-lg shadow-2xl"
+                  width={songs[0].album.images[0].width / 7}
+                  height={songs[0].album.images[0].width / 7}
+                  src={songs[0].album.images[0].url}
+                  alt={`${songs[0].name} album image`}
+                />
+                <h4 className="text-3xl font-bold mt-6">{songs[0].name}</h4>
+                <div className="mt-1">
+                  <span className="opacity-80">Song</span>
+                  <span className="mx-2">·</span>
+                  <span>
+                    {songs[0].artists.map(({ name }) => name).join(", ")}
+                  </span>
+                </div>
+              </div>
+            </Link>
           </div>
         )}
 

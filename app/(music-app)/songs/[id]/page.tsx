@@ -17,6 +17,7 @@ import LocalStorageProvider from "@/app/components/providers/LocalStorageProvide
 import ArtistProfiles from "@/app/components/artist-profiles";
 import { Suspense } from "react";
 import { fetchLyrics } from "@/app/utilsFn/fetchLyrics";
+import { darkenColor } from "@/app/utilsFn/colorFn/darkenColor";
 
 async function getPageData(id: string, token: string) {
   try {
@@ -137,17 +138,61 @@ function LazyContent({
         <h3 className="font-bold text-2xl">Analyze</h3>
         <div className="flex gap-4 mt-4">
           {[
-            { key: "lyrics", value: "Lyrics" },
-            { key: "related", value: "Related Media" },
-            { key: "details", value: "Details" },
-          ].map(({ key, value }) => (
+            {
+              key: "lyrics",
+              value: "Lyrics",
+              subWords: ["Lyrics", "Analyze", "Global"],
+              tagline: "Analyze Lyrics",
+            },
+            {
+              key: "related-media",
+              value: "Related Media",
+              subWords: ["Media", "Videos", "Global"],
+              tagline: "View Media",
+            },
+            {
+              key: "details",
+              value: "Details",
+              subWords: ["Data", "Visuals", "Global"],
+              tagline: "Visualize",
+            },
+          ].map(({ key, value, subWords, tagline }) => (
             <Link
               key={key} // Use key instead of index for better performance
               style={{ background: dominantColorRGB }}
               href={`/songs/${id}/${key}`}
-              className={`rounded-xl flex-1 p-4 h-52 text-xl font-bold ${textColor}`}
+              className={`rounded-xl flex-1 p-4 h-52 text-xl font-bold ${textColor} relative overflow-hidden`}
             >
               {value}
+
+              <div
+                style={{
+                  background: convertToRGB(darkenColor(dominantColorArr)),
+                }}
+                className="absolute w-44 h-44 -right-5 -bottom-10 rotate-[30deg] rounded-md flex flex-col justify-between shadow-2xl"
+              >
+                <div className="p-2">
+                  <Image
+                    src={`/spotify-icon.png`}
+                    width={10}
+                    height={10}
+                    alt="spotify logo image"
+                  />
+                  <p className="font-semibold mt-2">{subWords[0]}</p>
+                  <p>{subWords[1]}</p>
+                  <p className="opacity-80">{subWords[2]}</p>
+                </div>
+                <div className="flex justify-left gap-2">
+                  <div className="bg-white size-7 flex items-center justify-center rounded-bl-md">
+                    <Icon
+                      variant="arrow"
+                      size={10}
+                      className="invert rotate-45"
+                    />
+                  </div>
+                  <p className="font-sm">{tagline}</p>
+                </div>
+              </div>
             </Link>
           ))}
         </div>

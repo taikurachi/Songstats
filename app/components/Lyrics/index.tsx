@@ -1,6 +1,5 @@
 "use client";
 import { useEffect, useState, useRef } from "react";
-import { fetchLyrics } from "@/app/utilsFn/fetchLyrics";
 import convertToRGB from "@/app/utilsFn/colorFn/convertToRGB";
 import LyricsAnalysis from "./lyrics-analysis";
 import Icon from "../utils/Icon";

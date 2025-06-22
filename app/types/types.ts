@@ -16,6 +16,7 @@ export type SongType = {
     spotify: string;
   };
   imageURL?: string;
+  lyrics: string;
 };
 
 export type AlbumType = {

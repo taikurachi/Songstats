@@ -1,5 +1,6 @@
 "use client";
 
+import "flag-icons/css/flag-icons.min.css";
 import { SongType } from "@/app/types/types";
 import { useEffect, useState } from "react";
 import Image from "next/image";
@@ -7,6 +8,12 @@ import getSongLength from "@/app/utilsFn/getSongLength";
 import { fetchLyricsScore } from "@/app/utilsFn/fetchLyricsScore";
 import checkLuminance from "@/app/utilsFn/colorFn/checkLuminance";
 import convertToColorArr from "@/app/utilsFn/colorFn/convertToColorArr";
+import { fetchKworbCountry } from "@/app/utilsFn/fetchKworbCountry";
+import {
+  countryCodeMap,
+  getCountryName,
+  getCountryRegion,
+} from "@/app/const/countries";
 
 // Type for MyStreamCount data
 type MyStreamCountData = {
@@ -48,6 +55,8 @@ const calculateLongevityScore = (
 ): string => {
   console.log(streamCountData, "stream count data");
   if (!streamCountData) return "";
+  console.log(streamCountData.chart_data.chart_data.daily);
+
   const chartData = streamCountData.chart_data.chart_data;
   const releaseDate = new Date(streamCountData.track_info.release_date);
   const now = new Date();
@@ -131,6 +140,9 @@ const calculateLongevityScore = (
   else if (currentVsPeak >= 0.05) currentScore = 5; // 5-15% of peak
   else currentScore = 0; // Below 5% of peak
 
+  // add special case for extremely popular songs
+  if (streamCountData.track_info.total_streams > 1000000000) currentScore = 30;
+
   const totalScore = Math.min(
     100,
     Math.round(ageScore + consistencyScore + decayScore + currentScore)
@@ -165,10 +177,41 @@ export default function Details({ dominantColor }: { dominantColor: string }) {
     lyrics: string;
   }>(null);
 
+  const [topStreamsByCountry, setTopStreamsByCountry] = useState<string | null>(
+    null
+  );
+
   useEffect(() => {
     const storedDetails = sessionStorage.getItem("songDetails");
-    if (storedDetails) setSongDetails(JSON.parse(storedDetails));
+    if (storedDetails) {
+      const parsedDetails = JSON.parse(storedDetails);
+      console.log("Loaded songDetails from sessionStorage:", parsedDetails);
+      console.log("Song ID:", parsedDetails?.id);
+      setSongDetails(parsedDetails);
+    }
   }, []);
+
+  useEffect(() => {
+    if (!songDetails?.id) {
+      console.log("No songDetails or songDetails.id available:", songDetails);
+      return;
+    }
+
+    const getTopCountryByStreams = async () => {
+      try {
+        console.log("about to fetch with id", songDetails.id);
+        const result = await fetchKworbCountry(songDetails.id);
+        console.log("Kworb result:", result);
+        setTopStreamsByCountry(
+          result.topStreamsByCountry?.toLowerCase() || "us"
+        );
+      } catch (error) {
+        console.error("Error fetching top country:", error);
+        setTopStreamsByCountry("us"); // fallback to US
+      }
+    };
+    getTopCountryByStreams();
+  }, [songDetails?.id]);
 
   useEffect(() => {
     if (!streamCountData || !songDetails) return;
@@ -239,6 +282,7 @@ export default function Details({ dominantColor }: { dominantColor: string }) {
   }
 
   // Constants after we know songDetails exists
+
   const titleClass =
     songDetails.name.length > 10 ? "text-4xl mb-2" : "text-5xl mb-4";
   const releaseYear = songDetails.album.release_date.slice(0, 4);
@@ -448,12 +492,45 @@ export default function Details({ dominantColor }: { dominantColor: string }) {
         >
           <h4>Most Streamed Country</h4>
           <p className="opacity-70">Global</p>
-          <div className="mt-auto flex gap-4">
-            <Image src={"/us-flag.svg"} width={70} alt="us-flag" height={40} />
-            <div>
-              <p className="font-extralight text-sm">North America</p>
-              <p className="text-lg">United States</p>
-            </div>
+          <div className="mt-auto flex gap-4 items-center">
+            {topStreamsByCountry ? (
+              <>
+                <div
+                  style={{
+                    width: "62px",
+                    height: "46.5px",
+                    backgroundSize: "cover",
+                    backgroundPosition: "center",
+                    backgroundRepeat: "no-repeat",
+                  }}
+                  className={`fi fi-${topStreamsByCountry}`}
+                ></div>
+                <div className="">
+                  <p className="font-extralight text-[14px] translate-y-1">
+                    {topStreamsByCountry
+                      ? getCountryRegion(
+                          topStreamsByCountry.toUpperCase() as keyof typeof countryCodeMap
+                        )
+                      : "Unknown Region"}
+                  </p>
+                  <p className="text-2xl">
+                    {topStreamsByCountry
+                      ? getCountryName(
+                          topStreamsByCountry.toUpperCase() as keyof typeof countryCodeMap
+                        )
+                      : "Unknown Country"}
+                  </p>
+                </div>
+              </>
+            ) : (
+              <div className="flex gap-2 items-end">
+                <div className="animate-pulse w-20 h-12 bg-white bg-opacity-20 rounded"></div>
+                <div className="mt-1">
+                  <div className="w-32 h-4 mb-2 bg-white bg-opacity-20 rounded"></div>
+                  <div className="w-44 h-4 bg-white bg-opacity-20 rounded"></div>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </div>

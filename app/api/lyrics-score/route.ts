@@ -48,7 +48,7 @@ The score should be an integer from 0-100 representing the overall lyrical quali
         {
           role: "system",
           content:
-            "You are a music and literary critic expert. Analyze lyrics objectively and return only valid JSON with a single score. Consider poetic quality, emotional depth, originality, and meaning. Be critical but fair - most good songs score 60-80, exceptional lyrics score 80-95, masterpieces score 95+.",
+            "You are a music and literary critic expert. Analyze lyrics objectively and return only valid JSON with a single score. Consider poetic quality, emotional depth, originality, and meaning. Be critical but fair - most good songs score 75-80, exceptional lyrics score 80-90, masterpieces score 90+.",
         },
         { role: "user", content: query },
       ],

@@ -36,7 +36,7 @@ export default function Header() {
   return (
     <header className="sticky top-0 bg-black z-40 flex justify-between items-center px-4 w-full col-span-2">
       <QuickSearch />
-      <div className="flex justify-between w-full mx-auto items-center">
+      <div className="flex justify-between w-full mx-auto items-center relative">
         <Link href="/">
           <Image
             src="/spotify-icon.png"
@@ -45,7 +45,7 @@ export default function Header() {
             alt="spotify logo"
           />
         </Link>
-        <div className="relative">
+        <div className="absolute left-1/2 -translate-x-1/2">
           <div
             className={`flex items-center gap-4 relative group bg-spotify-gray hover:bg-spotify-lightGray ${
               activeInput ? "outline-white outline" : "outline-gray-600"
