@@ -14,6 +14,10 @@ import {
   getCountryName,
   getCountryRegion,
 } from "@/app/const/countries";
+import {
+  fetchExternalStreamCountData,
+  checkScraperApiHealth,
+} from "@/app/utilsFn/fetchExternalScraperData";
 
 // Type for MyStreamCount data
 type MyStreamCountData = {
@@ -32,7 +36,7 @@ type MyStreamCountData = {
         total: number;
         daily: number;
       };
-    };
+    } | null;
   };
   related_tracks: Array<{
     title: string;
@@ -54,21 +58,31 @@ const calculateLongevityScore = (
   streamCountData: MyStreamCountData
 ): string => {
   console.log(streamCountData, "stream count data");
-  if (!streamCountData) return "";
-  console.log(streamCountData.chart_data.chart_data.daily);
+  if (!streamCountData) return "50";
+
+  // Check if chart data exists and has data
+  if (
+    !streamCountData.chart_data?.chart_data ||
+    Object.keys(streamCountData.chart_data.chart_data).length === 0
+  ) {
+    console.log("No chart data available, returning default score");
+    return "50"; // Default score when no chart data
+  }
 
   const chartData = streamCountData.chart_data.chart_data;
-  const releaseDate = new Date(streamCountData.track_info.release_date);
+  const releaseDate = streamCountData.track_info.release_date
+    ? new Date(streamCountData.track_info.release_date)
+    : new Date();
   const now = new Date();
 
   // Convert chart data to array and sort by date
-
   const dataPoints = Object.entries(chartData)
     .map(([date, values]) => ({
       date: new Date(date),
-      total: values.total,
-      daily: values.daily,
+      total: values?.total || 0,
+      daily: values?.daily || 0,
     }))
+    .filter((point) => point.total > 0 || point.daily > 0) // Filter out empty data points
     .sort((a, b) => a.date.getTime() - b.date.getTime());
 
   if (dataPoints.length < 7) return "50"; // Not enough data
@@ -211,7 +225,7 @@ export default function Details({ dominantColor }: { dominantColor: string }) {
       }
     };
     getTopCountryByStreams();
-  }, [songDetails?.id]);
+  }, [songDetails]);
 
   useEffect(() => {
     if (!streamCountData || !songDetails) return;
@@ -240,37 +254,59 @@ export default function Details({ dominantColor }: { dominantColor: string }) {
       setStreamDataError(null);
 
       try {
-        const response = await fetch("/api/song-details", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            trackId: songDetails.id,
-          }),
-        });
+        console.log(`🚀 Fetching stream data for track: ${songDetails.id}`);
 
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
+        // First check if the scraper API is healthy
+        const isHealthy = await checkScraperApiHealth();
+        if (!isHealthy) {
+          console.warn("⚠️ Scraper API not healthy, trying anyway...");
         }
 
-        const data = await response.json();
+        // Use the Lambda scraper API
+        const data = await fetchExternalStreamCountData(songDetails.id, 45000); // 45 second timeout
 
-        if (data.success) {
-          setStreamCountData(data);
+        if (data && data.track_info) {
+          console.log("✅ Lambda scraper data received:", data);
+
+          // Transform the data to match the expected format
+          const transformedData: MyStreamCountData = {
+            track_id: data.track_id,
+            track_info: {
+              title: data.track_info.title || songDetails.name,
+              artist: data.track_info.artist || songDetails.artists[0]?.name,
+              total_streams: data.track_info.total_streams || 0,
+              release_date:
+                data.track_info.release_date || songDetails.album.release_date,
+              artwork_url:
+                data.track_info.artwork_url || songDetails.album.images[0]?.url,
+              album_name: data.track_info.album_name || songDetails.album.name,
+            },
+            chart_data: {
+              chart_data: data.chart_data?.chart_data || null,
+            },
+            related_tracks: (data.related_tracks || []).map((track) => ({
+              title: track.title || "",
+              artist: track.artist || "",
+              track_id: track.url?.split("/").pop() || "", // Extract track ID from URL
+            })),
+            success: true,
+          };
+
+          setStreamCountData(transformedData);
         } else {
-          setStreamDataError(data.error || "Failed to fetch stream data");
+          console.error("❌ No data received from Lambda scraper");
+          setStreamDataError("No stream data available");
         }
       } catch (error) {
-        console.error("Error fetching stream data:", error);
-        setStreamDataError("Failed to fetch stream data");
+        console.error("❌ Error fetching stream data from Lambda:", error);
+        setStreamDataError("Failed to fetch stream data from external scraper");
       } finally {
         setIsLoadingStreamData(false);
       }
     };
 
     fetchStreamData();
-  }, [songDetails?.id]);
+  }, [songDetails]);
 
   // Early return if no data
   if (!songDetails) {

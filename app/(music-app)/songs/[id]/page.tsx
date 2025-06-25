@@ -23,6 +23,7 @@ async function getPageData(id: string, token: string) {
   try {
     const songData = await fetchSongData(id, token);
     const lyrics = await fetchLyrics(songData.external_ids.isrc);
+    console.log(lyrics, "these are the lyrics stored");
     songData.lyrics = lyrics;
 
     if (!songData?.album?.images?.[0]?.url) {

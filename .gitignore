@@ -39,3 +39,25 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.Python
+*.so
+.pytest_cache/
+
+# Editor files
+*.swp
+*.swo
+*~
+.#*
+
+# System files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log

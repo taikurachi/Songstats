@@ -6,6 +6,7 @@ import Icon from "../utils/Icon";
 import { type SongType } from "@/app/types/types";
 import convertToColorArr from "@/app/utilsFn/colorFn/convertToColorArr";
 import checkLuminance from "@/app/utilsFn/colorFn/checkLuminance";
+import { useSongData } from "@/app/hooks/useSongData";
 
 const calcHighlightColor = (dominantColor: string) => {
   const dominantColorArr: number[] = convertToColorArr(dominantColor);
@@ -23,8 +24,8 @@ const calcHighlightColor = (dominantColor: string) => {
 };
 
 export default function Lyrics({ dominantColor }: { dominantColor: string }) {
-  console.log("Lyrics component is rendering!");
   const [songDetails, setSongDetails] = useState<SongType | null>(null);
+  const [lyricsFetched, setLyricsFetched] = useState<boolean>(false);
   const [lyricsAnalysis, setLyricsAnalysis] = useState<{
     lyrics_analysis: Record<string, { analysis: string; themes: string }>;
   } | null>(null);
@@ -59,10 +60,15 @@ export default function Lyrics({ dominantColor }: { dominantColor: string }) {
     const data: string | null = sessionStorage.getItem("songDetails");
     if (!data) return;
     const retriedvedLyrics = JSON.parse(data).lyrics;
+    if (!retriedvedLyrics) {
+      setLyricsFetched(true);
+      return;
+    }
     const processedLyrics = retriedvedLyrics
       .slice(0, retriedvedLyrics.indexOf("*", 1))
       .split("\n");
     setLyrics(processedLyrics);
+    setLyricsFetched(true);
   }, []);
 
   const highlightedColor = calcHighlightColor(dominantColor);
@@ -105,7 +111,8 @@ export default function Lyrics({ dominantColor }: { dominantColor: string }) {
         className="p-8 h-full flex-1 rounded-lg overflow-y-scroll flex flex-col"
         style={{ background: dominantColor }}
       >
-        {lyrics.length === 0 && <div>Loading...</div>}
+        {!lyricsFetched && <div>Loading...</div>}
+        {lyricsFetched && <div>No lyrics found just yet.</div>}
 
         {lyrics.map((line: string, index: number) =>
           line === "" ? (
@@ -158,7 +165,7 @@ export default function Lyrics({ dominantColor }: { dominantColor: string }) {
         ref={containerRef}
         className="flex-1 p-8 overflow-y-scroll h-full bg-spotify-darkGray rounded-lg"
       >
-        {lyrics.length > 0 && songDetails && (
+        {lyrics.length > 0 && songDetails ? (
           <LyricsAnalysis
             lyrics={lyrics}
             dominantColor={dominantColor}
@@ -168,6 +175,8 @@ export default function Lyrics({ dominantColor }: { dominantColor: string }) {
             highlightedColor={highlightedColor}
             contentRefs={contentRefs}
           />
+        ) : (
+          <div>No lyrics found just yet.</div>
         )}
       </div>
     </>
