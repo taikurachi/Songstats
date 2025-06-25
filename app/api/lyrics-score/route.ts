@@ -88,7 +88,10 @@ The score should be an integer from 0-100 representing the overall lyrical quali
           headers: { "Content-Type": "application/json" },
         });
       } catch (parseError) {
-        console.error("JSON parse error:", parseError.message);
+        console.error(
+          "JSON parse error:",
+          parseError instanceof Error ? parseError.message : parseError
+        );
         console.error("Raw content:", content);
 
         // Fallback: try to extract number from response

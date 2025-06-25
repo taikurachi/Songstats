@@ -99,44 +99,58 @@ Select 5-8 of the most impactful lines from the lyrics and provide thoughtful an
           headers: { "Content-Type": "application/json" },
         });
       } catch (parseError) {
-        console.error("Step 7 FAILED - JSON parse error:", parseError.message);
+        console.error(
+          "Step 7 FAILED - JSON parse error:",
+          parseError instanceof Error ? parseError.message : parseError
+        );
         console.error("Raw content that failed to parse:", content);
         return new Response(
           JSON.stringify({
             error: "Invalid JSON response from API",
             raw_content: content,
-            parse_error: parseError.message,
+            parse_error:
+              parseError instanceof Error
+                ? parseError.message
+                : String(parseError),
           }),
           { status: 500 }
         );
       }
     } catch (apiError) {
+      const errorMessage =
+        apiError instanceof Error ? apiError.message : String(apiError);
+      const axiosError = axios.isAxiosError(apiError) ? apiError : null;
+
       console.error("Step 5 FAILED - Perplexity API error:", {
-        message: apiError.message,
-        status: apiError.response?.status,
-        statusText: apiError.response?.statusText,
-        data: apiError.response?.data,
-        code: apiError.code,
+        message: errorMessage,
+        status: axiosError?.response?.status,
+        statusText: axiosError?.response?.statusText,
+        data: axiosError?.response?.data,
+        code: axiosError?.code,
       });
       return new Response(
         JSON.stringify({
           error: "Perplexity API error",
-          details: apiError.message,
-          status: apiError.response?.status,
+          details: errorMessage,
+          status: axiosError?.response?.status,
         }),
         { status: 500 }
       );
     }
   } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    const errorStack = error instanceof Error ? error.stack : undefined;
+    const errorName = error instanceof Error ? error.name : undefined;
+
     console.error("🚨 GENERAL ERROR:", {
-      message: error.message,
-      stack: error.stack,
-      name: error.name,
+      message: errorMessage,
+      stack: errorStack,
+      name: errorName,
     });
     return new Response(
       JSON.stringify({
         error: "Server error",
-        details: error.message,
+        details: errorMessage,
       }),
       { status: 500 }
     );

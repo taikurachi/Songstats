@@ -23,7 +23,10 @@ export async function GET(request: Request) {
     // Log the request details for debugging
     console.log("Making token request with:", {
       grant_type: "authorization_code",
-      redirect_uri: "http://localhost:3000/api/get-refresh-token",
+      redirect_uri:
+        process.env.NODE_ENV === "production"
+          ? `https://${process.env.VERCEL_URL}/api/get-refresh-token`
+          : "http://localhost:3000/api/get-refresh-token",
       hasCode: !!code,
       hasClientId: !!clientId,
       hasClientSecret: !!clientSecret,
@@ -34,7 +37,10 @@ export async function GET(request: Request) {
       new URLSearchParams({
         grant_type: "authorization_code",
         code: code,
-        redirect_uri: "http://localhost:3000/api/get-refresh-token",
+        redirect_uri:
+          process.env.NODE_ENV === "production"
+            ? `https://${process.env.VERCEL_URL}/api/get-refresh-token`
+            : "http://localhost:3000/api/get-refresh-token",
       }),
       {
         headers: {

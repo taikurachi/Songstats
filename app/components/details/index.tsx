@@ -282,7 +282,10 @@ export default function Details({ dominantColor }: { dominantColor: string }) {
               album_name: data.track_info.album_name || songDetails.album.name,
             },
             chart_data: {
-              chart_data: data.chart_data?.chart_data || null,
+              chart_data:
+                (data.chart_data?.chart_data as {
+                  [date: string]: { total: number; daily: number };
+                } | null) ?? null,
             },
             related_tracks: (data.related_tracks || []).map((track) => ({
               title: track.title || "",

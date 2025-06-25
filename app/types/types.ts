@@ -17,6 +17,7 @@ export type SongType = {
   };
   imageURL?: string;
   lyrics: string;
+  analyzedDate?: string;
 };
 
 export type AlbumType = {

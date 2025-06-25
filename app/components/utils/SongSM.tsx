@@ -18,10 +18,18 @@ export default function SongSM({ song, index }: SongSMProps) {
           width={40}
           height={40}
         />
-        <div>
-          <p className="font-medium text-lg">{song.name}</p>
-          <p>{song.artists.map((artist) => artist.name).join(", ")}</p>
+        <div className="w-2/5">
+          <p className="font-extralight text-lg whitespace-nowrap overflow-hidden text-ellipsis">
+            {song.name}
+          </p>
+          <p className="opacity-70">
+            {song.artists.map((artist) => artist.name).join(", ")}
+          </p>
         </div>
+        <p className="w-2/5 opacity-70 lg:block hidden">{song.album.name}</p>
+        <p className="w-1/5 opacity-70 ml-auto">
+          {song.analyzedDate || "No date found"}
+        </p>
       </div>
     </Link>
   );

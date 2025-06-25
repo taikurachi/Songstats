@@ -6,7 +6,6 @@ import Icon from "../utils/Icon";
 import { type SongType } from "@/app/types/types";
 import convertToColorArr from "@/app/utilsFn/colorFn/convertToColorArr";
 import checkLuminance from "@/app/utilsFn/colorFn/checkLuminance";
-import { useSongData } from "@/app/hooks/useSongData";
 
 const calcHighlightColor = (dominantColor: string) => {
   const dominantColorArr: number[] = convertToColorArr(dominantColor);
@@ -112,7 +111,9 @@ export default function Lyrics({ dominantColor }: { dominantColor: string }) {
         style={{ background: dominantColor }}
       >
         {!lyricsFetched && <div>Loading...</div>}
-        {lyricsFetched && <div>No lyrics found just yet.</div>}
+        {lyricsFetched && lyrics.length === 0 && (
+          <div>No lyrics found just yet.</div>
+        )}
 
         {lyrics.map((line: string, index: number) =>
           line === "" ? (

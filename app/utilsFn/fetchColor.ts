@@ -4,7 +4,7 @@ export const originalFetchColor = async (imageUrl: string) => {
   try {
     const baseUrl =
       process.env.NODE_ENV === "production"
-        ? "https://your-production-url.com" // Replace with your production URL
+        ? `https://${process.env.VERCEL_URL}` // Use the Vercel URL in production
         : "http://localhost:3000";
 
     const response = await fetch(

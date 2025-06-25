@@ -14,7 +14,7 @@ export default function SongsDefault() {
     setSongs(JSON.parse(songHistory));
   }, []);
   return (
-    <div className="col-start-2 row-start-2 bg-spotify-darkGray rounded-lg mr-2 relative">
+    <div className="col-start-2 row-start-2 overflow-y-scroll bg-spotify-darkGray rounded-lg mr-2 relative">
       <main
         className="flex gap-6 p-6"
         style={{
@@ -53,16 +53,13 @@ export default function SongsDefault() {
         }}
       ></div>
       <div className="relative z-10">
-        <div className="border-b border-white py-4 flex border-opacity-20 mx-8">
-          <div>
-            <span className="ml-4">#</span>
-            <span className="ml-[74px]">Title</span>
-          </div>
-          <span>Album</span>
-          <span>Date analyzed</span>
-          <Icon variant="time" size={10} />
+        <div className="border-b border-white py-4 flex border-opacity-40 mx-8 opacity-70 px-4">
+          <div className="w-[86px] lg:w-[92px]">#</div>
+          <div className="w-2/5">Title</div>
+          <div className="w-2/5 hidden lg:block">Album</div>
+          <div className="w-1/5 ml-auto">Date analyzed</div>
         </div>
-        <div className="flex flex-col ml-8 mt-4">
+        <div className="flex flex-col mx-8 my-4">
           {songs.length > 0 &&
             songs.map((song: SongType, index: number) => (
               <SongSM song={song} key={index} index={index} />

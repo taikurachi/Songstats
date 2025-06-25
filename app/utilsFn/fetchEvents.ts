@@ -5,7 +5,7 @@ const fetchEventsOriginal = async (artistName: string) => {
     console.log(`🎪 Making API call for events: ${artistName}`);
     const baseUrl =
       process.env.NODE_ENV === "production"
-        ? "https://your-production-url.com" // Use the production base URL
+        ? `https://${process.env.VERCEL_URL}` // Use the Vercel URL in production
         : "http://localhost:3000"; // Use localhost URL during development
 
     const url = `${baseUrl}/api/events?artistName=${encodeURIComponent(

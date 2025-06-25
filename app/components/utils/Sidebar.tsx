@@ -1,7 +1,7 @@
 "use client";
 import { iconVariants } from "@/app/types/types";
 import Icon from "./Icon";
-import { useParams } from "next/navigation";
+import { useParams, usePathname } from "next/navigation";
 import Link from "next/link";
 
 const icons = {
@@ -13,6 +13,10 @@ const icons = {
 
 export default function Sidebar() {
   const { id } = useParams();
+  const pathname = usePathname();
+
+  // Check if we're on a valid song route
+  const isOnSongRoute = pathname.startsWith("/songs/") && id;
 
   return (
     <nav className="sticky top-20 left-0 h-full bg-spotify-darkGray rounded-lg text-white overflow-y-auto z-20 px-2 py-4 mx-2">
@@ -33,19 +37,32 @@ export default function Sidebar() {
             details: `/songs/${id}/details`,
           };
 
-          const pathname = pathMap[key] || `/songs/${id}`;
+          const linkPath = pathMap[key] || `/songs/${id}`;
 
           return (
             <li
-              className="flex items-center gap-6 p-2 hover:bg-spotify-gray cursor-pointer"
-              key={key} // Better to use key instead of index
+              className={`flex items-center gap-6 p-2 ${
+                isOnSongRoute
+                  ? "hover:bg-spotify-gray cursor-pointer"
+                  : "opacity-50 cursor-not-allowed"
+              }`}
+              key={key}
             >
-              <Link href={pathname} className="flex items-center gap-6">
-                <div className="p-3 rounded-md bg-spotify-lightGray w-14 h-14 flex items-center justify-center">
-                  <Icon variant={key as iconVariants} size={22} />
+              {isOnSongRoute ? (
+                <Link href={linkPath} className="flex items-center gap-6">
+                  <div className="p-3 rounded-md bg-spotify-lightGray w-14 h-14 flex items-center justify-center">
+                    <Icon variant={key as iconVariants} size={22} />
+                  </div>
+                  <p className="text-lg">{value}</p>
+                </Link>
+              ) : (
+                <div className="flex items-center gap-6">
+                  <div className="p-3 rounded-md bg-spotify-lightGray w-14 h-14 flex items-center justify-center">
+                    <Icon variant={key as iconVariants} size={22} />
+                  </div>
+                  <p className="text-lg">{value}</p>
                 </div>
-                <p className="text-lg">{value}</p>
-              </Link>
+              )}
             </li>
           );
         })}

@@ -2,7 +2,7 @@ export const fetchLyrics = async (isrc: string) => {
   try {
     const baseUrl =
       process.env.NODE_ENV === "production"
-        ? "https://your-production-url.com" // Use the production base URL
+        ? `https://${process.env.VERCEL_URL}` // Use the Vercel URL in production
         : "http://localhost:3000"; // Use localhost URL during development
 
     const url = `${baseUrl}/api/lyrics?isrc=${isrc}`;

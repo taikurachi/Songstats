@@ -4,7 +4,7 @@ import { cookies } from "next/headers";
 export default async function DetailsPage({
   params,
 }: {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
   const cookieStore = await cookies();

@@ -219,7 +219,11 @@ function LazyContent({
   );
 }
 
-export default async function SongPage({ params }: { params: { id: string } }) {
+export default async function SongPage({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
   const { id } = await params;
 
   // Early returns for better performance
