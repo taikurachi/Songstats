@@ -1,4 +1,4 @@
-import Lyrics from "@/app/components/lyrics";
+import Lyrics from "../../../../components/lyrics";
 import { cookies } from "next/headers";
 
 export default async function LyricsPage({
