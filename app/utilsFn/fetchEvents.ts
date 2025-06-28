@@ -2,15 +2,7 @@ import { cache } from "react";
 
 const fetchEventsOriginal = async (artistName: string) => {
   try {
-    console.log(`🎪 Making API call for events: ${artistName}`);
-    const baseUrl =
-      process.env.NODE_ENV === "production"
-        ? `https://${process.env.VERCEL_URL}` // Use the Vercel URL in production
-        : "http://localhost:3000"; // Use localhost URL during development
-
-    const url = `${baseUrl}/api/events?artistName=${encodeURIComponent(
-      artistName
-    )}`;
+    const url = `/api/events?artistName=${encodeURIComponent(artistName)}`;
     const response = await fetch(url, {
       next: { revalidate: 3600 }, // Cache for 1 hour (events change frequently)
     });

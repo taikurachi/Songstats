@@ -5,7 +5,7 @@ export const originalFetchColor = async (imageUrl: string) => {
     const baseUrl =
       process.env.NODE_ENV === "production"
         ? `https://${process.env.VERCEL_URL}` // Use the Vercel URL in production
-        : "http://localhost:3000";
+        : "http://localhost:3000"; // Use localhost in development
 
     const response = await fetch(
       `${baseUrl}/api/color-thief?imageUrl=${encodeURIComponent(imageUrl)}`,

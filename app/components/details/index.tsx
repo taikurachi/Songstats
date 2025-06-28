@@ -57,7 +57,6 @@ type TimePeriod = "1M" | "3M" | "6M" | "YTD" | "All";
 const calculateLongevityScore = (
   streamCountData: MyStreamCountData
 ): string => {
-  console.log(streamCountData, "stream count data");
   if (!streamCountData) return "50";
 
   // Check if chart data exists and has data
@@ -199,23 +198,20 @@ export default function Details({ dominantColor }: { dominantColor: string }) {
     const storedDetails = sessionStorage.getItem("songDetails");
     if (storedDetails) {
       const parsedDetails = JSON.parse(storedDetails);
-      console.log("Loaded songDetails from sessionStorage:", parsedDetails);
-      console.log("Song ID:", parsedDetails?.id);
+
       setSongDetails(parsedDetails);
     }
   }, []);
 
   useEffect(() => {
     if (!songDetails?.id) {
-      console.log("No songDetails or songDetails.id available:", songDetails);
       return;
     }
 
     const getTopCountryByStreams = async () => {
       try {
-        console.log("about to fetch with id", songDetails.id);
         const result = await fetchKworbCountry(songDetails.id);
-        console.log("Kworb result:", result);
+
         setTopStreamsByCountry(
           result.topStreamsByCountry?.toLowerCase() || "us"
         );
@@ -254,8 +250,6 @@ export default function Details({ dominantColor }: { dominantColor: string }) {
       setStreamDataError(null);
 
       try {
-        console.log(`🚀 Fetching stream data for track: ${songDetails.id}`);
-
         // First check if the scraper API is healthy
         const isHealthy = await checkScraperApiHealth();
         if (!isHealthy) {
@@ -266,8 +260,6 @@ export default function Details({ dominantColor }: { dominantColor: string }) {
         const data = await fetchExternalStreamCountData(songDetails.id, 45000); // 45 second timeout
 
         if (data && data.track_info) {
-          console.log("✅ Lambda scraper data received:", data);
-
           // Transform the data to match the expected format
           const transformedData: MyStreamCountData = {
             track_id: data.track_id,
