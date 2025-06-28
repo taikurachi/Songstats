@@ -1,4 +1,4 @@
-import Lyrics from "../../../../components/lyrics/index";
+import Lyrics from "../../../../components/lyrics-component/index";
 import { cookies } from "next/headers";
 
 export default async function LyricsPage({
