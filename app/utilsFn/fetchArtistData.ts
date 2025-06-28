@@ -2,7 +2,6 @@ import { cache } from "react";
 
 const fetchArtistDataOriginal = async (artistIds: string[], token: string) => {
   try {
-    console.log(`🎤 Making API calls for ${artistIds.length} artists`);
     const res = await Promise.all(
       artistIds.map(async (artistId) => {
         const response = await fetch(

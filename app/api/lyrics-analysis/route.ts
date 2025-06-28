@@ -2,8 +2,6 @@ import axios from "axios";
 import { NextRequest } from "next/server";
 
 export async function POST(request: NextRequest) {
-  console.log("🚀 API route /api/chat POST called");
-
   try {
     const body = await request.json();
     const { artistName, songName, lyrics, albumName } = body;

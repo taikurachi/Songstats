@@ -1,30 +1,33 @@
 import { cache } from "react";
+import { getImageDominantColor } from "./color-thief.js";
 
 export const originalFetchColor = async (imageUrl: string) => {
   try {
-    const baseUrl =
-      process.env.NODE_ENV === "production"
-        ? `https://${process.env.VERCEL_URL}` // Use the Vercel URL in production
-        : "http://localhost:3000"; // Use localhost in development
+    // Check if we're on server-side (no window object)
+    const isServerSide = typeof window === "undefined";
 
-    const response = await fetch(
-      `${baseUrl}/api/color-thief?imageUrl=${encodeURIComponent(imageUrl)}`,
-      {
-        next: { revalidate: 86400 }, // Cache for 24 hours (colors never change)
+    if (isServerSide) {
+      // Server-side: Call the function directly
+      const dominantColorArr = await getImageDominantColor(imageUrl);
+      return { dominantColorArr };
+    } else {
+      // Client-side: Make HTTP request to API route
+      const response = await fetch(
+        `/api/color-thief?imageUrl=${encodeURIComponent(imageUrl)}`,
+        {
+          next: { revalidate: 86400 }, // Cache for 24 hours (colors never change)
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
       }
-    );
 
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
+      const data = await response.json();
+      return {
+        dominantColorArr: data.dominantColorArr as number[],
+      };
     }
-
-    const data = await response.json();
-
-    // The colorThief API returns { dominantColorArr: [r, g, b] }
-    // We'll normalize it to { dominantColor: [r, g, b] } for consistency
-    return {
-      dominantColorArr: data.dominantColorArr as number[],
-    };
   } catch (error) {
     console.error("Error fetching color:", error);
     // Return a default color if the API fails

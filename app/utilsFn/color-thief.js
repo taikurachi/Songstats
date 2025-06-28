@@ -168,3 +168,29 @@
 // }
 
 // export default ColorThief;
+
+import ColorThief from "pure-color-thief-node";
+import fetch from "node-fetch";
+
+export async function getImageDominantColor(imageUrl) {
+  try {
+    const imageResponse = await fetch(imageUrl);
+    const imageArrayBuffer = await imageResponse.arrayBuffer();
+    const imageBuffer = Buffer.from(imageArrayBuffer);
+
+    const img = new ColorThief();
+    await img.loadImage(imageBuffer, "image/jpeg");
+    const dominantColorArr = img.getColor();
+
+    // if color is too close to black, we redirect to gray
+    if (dominantColorArr.every((channel) => channel < 30)) {
+      return [80, 80, 80];
+    }
+
+    return dominantColorArr;
+  } catch (error) {
+    console.error("Error extracting color:", error);
+    // Return a default color if extraction fails
+    return [128, 128, 128];
+  }
+}
