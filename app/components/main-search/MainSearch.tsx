@@ -32,6 +32,7 @@ const defaultSongs = [
 
 export default function MainSearch() {
   const dropdownRef = useRef<HTMLDivElement | null>(null);
+  const isNavigatingRef = useRef<boolean>(false);
   const [searchString, setSearchString] = useState<string>("");
   const { token } = useToken();
   const [activeInput, setActiveInput] = useState<boolean>(false);
@@ -41,12 +42,27 @@ export default function MainSearch() {
     setSearchString(e.target.value);
     setActiveInput(true);
   };
-  const handleOnBlur = (e: React.FocusEvent<HTMLInputElement>) => {
-    if (dropdownRef.current && dropdownRef.current.contains(e.relatedTarget))
-      return;
+  const handleOnBlur = () => {
+    // Use setTimeout to delay the blur handler, allowing click events to fire first
+    // This fixes Safari issue where blur fires before the link click
+    setTimeout(() => {
+      // Don't close if we're navigating to a song
+      if (isNavigatingRef.current) return;
 
-    setActiveInput(false);
-    setSearchString("");
+      if (
+        dropdownRef.current &&
+        dropdownRef.current.contains(document.activeElement)
+      )
+        return;
+
+      setActiveInput(false);
+      setSearchString("");
+    }, 150);
+  };
+
+  const handleSongClick = () => {
+    // Set flag to prevent blur from closing the dropdown during navigation
+    isNavigatingRef.current = true;
   };
 
   useEffect(() => {
@@ -133,7 +149,13 @@ export default function MainSearch() {
               className="h-full flex flex-col text-black bg-white pl-6 pr-10 pb-6 overflow-y-scroll"
             >
               {songs.map((song, index) => (
-                <Song song={song} index={index} key={index} usage="main" />
+                <Song
+                  song={song}
+                  index={index}
+                  key={index}
+                  usage="main"
+                  onNavigate={handleSongClick}
+                />
               ))}
             </div>
           </div>

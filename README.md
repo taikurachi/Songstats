@@ -58,7 +58,7 @@ A modern, feature-rich music analytics web application built with Next.js that p
 - **Wave Background**: P5.js-powered animated background on the home page
 - **Dark Theme**: Eye-friendly dark mode throughout the application
 
-## 🛠️ Tech Stack
+## Tech Stack
 
 ### **Frontend**
 

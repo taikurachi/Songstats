@@ -10,13 +10,21 @@ type SongProps = {
   index: number;
   usage: "main" | "quick";
   ref?: ForwardedRef<HTMLAnchorElement>;
+  onNavigate?: () => void;
 };
 
-export default function Song({ song, usage, index, ref }: SongProps) {
+export default function Song({
+  song,
+  usage,
+  index,
+  ref,
+  onNavigate,
+}: SongProps) {
   return (
     <Link
       ref={ref}
       href={`/songs/${song.id}`}
+      onMouseDown={onNavigate}
       className={`w-full ${
         usage === "quick"
           ? "hover:bg-spotify-lightGray focus:bg-spotify-lightGray"
