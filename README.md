@@ -31,7 +31,7 @@ A modern, feature-rich music analytics web application built with Next.js that p
 - **Country-by-Country Stats**: Streaming data broken down by country (via Kworb)
 - **Visual Analytics**: Interactive charts and graphs
 
-### 🎼 **Lyrics & Analysis**
+### **Lyrics & Analysis**
 
 - **Synchronized Lyrics**: Display song lyrics with ISRC matching
 - **AI-Powered Analysis**: Intelligent lyrics interpretation using Perplexity AI
@@ -256,7 +256,7 @@ npm run test:watch
 npm run test:coverage
 ```
 
-## 🎨 Features in Detail
+## Features in Detail
 
 ### Dynamic Color Extraction
 
