@@ -1,5 +1,7 @@
 # Songstats
 
+Live Link: https://www.songstats.xyz/
+
 A modern, feature-rich music analytics web application built with Next.js that provides comprehensive song data, streaming statistics, lyrics analysis, and more. Explore detailed insights about your favorite tracks with data from Spotify, streaming platforms, and concert events.
 
 ![Next.js](https://img.shields.io/badge/Next.js-15.1.2-black?style=flat-square&logo=next.js)
